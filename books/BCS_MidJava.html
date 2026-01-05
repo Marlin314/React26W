@@ -208,7 +208,7 @@ That is not a problem except for the fact that because of the name collision, ev
 
 ::I java
 ==WinApp.java
-  package graphics;
+  package react.graphics;
   
   /*
    * WinApp is both a JPanel which contains the paint proc and it is an
@@ -290,7 +290,7 @@ That is not a problem except for the fact that because of the name collision, ev
 ::S Testing WinApp
 ==Testing WinApp
 
-In order to test WinApp we will write the graphical equivalent of HelloWordl, the simplest thing that uses WinApp and gives you some graphics output.
+In order to test WinApp we will write the graphical equivalent of HelloWorld, the simplest thing that uses WinApp and gives you some graphics output.
 
 --in sandbox create class RedRect
   public class RedRect extends WinApp{  
@@ -313,7 +313,7 @@ If you just copy and paste that code into a RedRect class, the IDE will correctl
 
 1) I did not put in a package statement to tell the compiler that RedRect was in sandbox.
   
-2) I did not tell it that WinApp lives over in the graphics package so I need to import it.
+2) I did not tell it that WinApp lives over in the react.graphics package so I need to import it.
   
 3) I did not tell it that Graphics (and Color) live in the java.awt package so I need to import those classes as well.
 
@@ -322,14 +322,14 @@ If you hover the mouse over a red underlined portion of the code, IDEA should gi
 When it finished there were 3 new lines of code at the top of what I wrote in this document:
 
   package sandbox;
-  import graphics.WinApp;
+  import react.graphics.WinApp;
   import java.awt.*;
 
-Every java class needs this sort of garbage in the header, telling the name of the package that the class lives in, and where to find all the OTHER classes that this class refers to. I will try to include this sort of information in the code samples that I list in the future, but in case I forget, I want you to know that fixing up imports and locating things in your own directory structure is just part of the nonsense that you must deal with in any mid-sized java project.
+Every java class needs this sort of garbage in the header, telling the java compiler the name of the package that the class lives in, and where to find all the OTHER classes that this class refers to. I will try to include some of this sort of information in the code samples that I list in the future, but in case I forget, I want you to know that fixing up imports and locating things in your own directory structure is just part of the nonsense that you must deal with in any mid-sized java project.
 
 --Commit: RedRect added to sandbox
 
-Presumably once you got it fixed up, you ran the code and saw it draw a red rectangle (a square actually) that was 100 pixels from the left margin of the window, 100 pixels from the top of the windown, 100 pixels wide, and 100 pixels hight. Hello World!
+Presumably once you got it fixed up, you ran the code and saw it draw a red rectangle (a square actually) that was 100 pixels from the left margin of the window, 100 pixels from the top of the window, 100 pixels wide, and 100 pixels high. Hello World!
 
 ==@Override
 
