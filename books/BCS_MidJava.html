@@ -357,19 +357,19 @@ So if you take out the "t" it is still a legal program. The compiler will not co
 
 Technically this is/was actually a bug in the original definition of the Java Language, and you can tell that from the way that they spelled it, "@override" not "override". 
 
-In a language which is known for (both revered AND hated) being very verbose precicely to help prevent you from making mistakes; if you want a function to be abstract you must declare it abstract, if you want a function to throw exceptions you must declare that it throws exceptions, if you wanted to override a function then you must declare it to overrides... oops, wait, we fogot to put that into the language definition - 'override' should have been a keyword that comes just befor a function definition. This was an oversight!
+In a language which is known (both revered AND hated) for being very verbose precisely to help prevent you from making mistakes; if you want a function to be abstract you must declare it abstract, if you want a function to throw exceptions you must declare that it throws exceptions, if you wanted to override a function then you must declare it to overrides... oops, wait, we forgot to put that into the language definition - 'override' should have been a keyword that comes just befor a function definition. This was an oversight!
 
 Oh damn! we have already frozen the set of keywords in the langusage. We can't just add some new word like "override" now. People might already be using that word as a variable name in their code. We could break java code that people have alreday written by adding a new keyword. What can we do? 
 
 Oh wait, we have just added this ANNOTATION system where speical lines that start with an @ can tell the compiler extra crap that a debugger might need. We can just put override into the annotation system. 
 
-And that is why it has an '@' in front and is why it sits on a stand alone line rather than just being another keyword that is part of a function signature. Oops, Sorry!
+And that is why it has an '@' in front and is why it sits on a stand-alone line rather than just being just another keyword that is part of a function signature. Oops, Sorry!
 
-How does the annotation work? Go ahead and put the @Override line in front of paintComponent. Now if you spell "paintComponent" correctly, all is good, but if you misspell the function name, then compiler complains immediately - "hey, you told me painComponent was a function name in an ancestor of this class but I can't find it". So there you go. @Override give you EXTRA SAFETY - that is clearly the Java way. It IS a best practice and you should get in the habit of using it.
+How does this annotation work? Go ahead and put the @Override line in front of paintComponent. Now if you spell "paintComponent" correctly, all is good, but if you misspell the function name, then compiler complains immediately - "hey, you told me painComponent was a function name in an ancestor of this class but I can't find it". So there you go. @Override give you EXTRA SAFETY - and that is clearly the Java way! It IS a best practice and you should get in the habit of using it.
 
-You should, and I should too. I will try to be better about it. The real problem is that the compiler does NOT require override statements. The compiler does not need to know your intentions. You either override something or you don't. When I am writing my code I know whether I am overriding or not. When I test my code I detect whether I actually get the override or not. If I mispell, it doesn't work, and I fix it.
+You should, and I should too. I will try to be better about it. The real problem is that the compiler does NOT require override statements. The compiler does not need to know your intentions. You either override something or you don't. When I am writing my code I know whether I am overriding or not. When I test my code I detect whether I actually get the override or not. If I misspell, it doesn't work, and I fix it.
 
-It turns out that the ACTUAL issue here is NOT whether or not you need help detecting a spelling error in a function name. The real question is whether or not you should include messages in your code telling others what you INTENDED at this point in your code. Are you writing code for the compiler or are you writing it for humans that may have to read it later, try to understand it and do maintainence on it.
+It turns out that the ACTUAL issue here is NOT whether or not you need help detecting a spelling error in a function name. The real question is whether or not you should include messages in your code telling others what you INTENDED at this point in your code. Are you writing code for the compiler or are you writing it for humans that may have to read it later, try to understand it and do maintenance on it.
 
 And now that I have told you why you SHOULD include overrides in your code so that you have properly expressed your INTENTIONS, I would like to point out that the IDE is already subtly doing that for you when it false colors the names of your functions. If you pay attention to the colors you can see the intent. So yeah, I sometimes forget to include those ugly @Override statements because I learned Java in the early days before they even had annotation and then moved to IDEs that detect and highlight my intent.
 
@@ -422,10 +422,10 @@ And without my even telling you, you KNOW that a WinApp MUST override paintCompo
     g.fillRect(100,100,100,100);
   }
 
-You add that AFTER the constructor and BEFOR the main routine. You watch the IDE whine about BOTH the Override AND that it does not know what you mean by Graphics, (you can't override paintComponent withoug a java.awt.Graphics parameter and you haven't yet imported Graphics - two IDE detected errors for the price of one). So you let it fix the imports for Graphics. And now your file looks like this:
+You add that AFTER the constructor and BEFORE the main routine. You watch the IDE whine about BOTH the Override AND that it does not know what you mean by Graphics, (you can't override paintComponent withoug a java.awt.Graphics parameter and you haven't yet imported Graphics - two IDE detected errors for the price of one). So you let it fix the imports for Graphics. And now your file looks like this:
 
   package sandbox;
-  import graphics.WinApp;
+  import react.graphics.WinApp;
   import java.awt.*;
   
   public class Paint extends WinApp{
@@ -442,11 +442,9 @@ You add that AFTER the constructor and BEFOR the main routine. You watch the IDE
 
 which is pretty much exactly what redRect looked like: the minimal application that uses and tests WinApp. You can run and test.
 
---Commit: Paint added to sandbox
+So what I would like from you is that I could say, "create me a WinApp named Paint" (which is what I am thinking about) and you, in theory, could produce all that above code. What you should be thinking is, "I need to extend WinApp, I need a constructor, I want to make it runnable so I will need a main routine and it MUST also have a testable paintComponent to be a Graphics based application." 
 
-So what I would like from you is that I could say, "create me a WinApp named Paint" (which is what I am thinkig about) and you, in theory, could produce all that above code. What you should be thinking is, "I need to extend WinApp, I need a constructor, I want to make it runnable so I will need a main routine and it MUST also have a testable paintComponent to be a Graphics based application." 
-
-It might occur to you that the quick way to create a new WinApp is to treat RedRect as a template for any WinApp. (open up RedRect, copy all the code, create a new class named Foo, paste the copy on top of what the IDE created, change the name from RedRect to Foo).
+It might occur to you that the quick way to create a new WinApp would be to treat RedRect as a template for any WinApp. (open up RedRect, copy all the code, create a new class named Foo, paste the copy on top of what the IDE created, change the name from RedRect to Foo).
 
 So now that you have a Paint application we will start using it to explore Swing output commands.
 
@@ -463,7 +461,7 @@ The way it works is like this: all painting in a windowing system is done to a "
 
 When you make a call like g.fillRect(x,y,w,h). You are telling that g object that was handed to you by the operating system the "local coordinates" that you want to use for your drawing. The first two parameters x and y are the location of the top left corner of the rect. The other two parameters, w and h, are the width and height of ther rect. The numbers are all in pixels.
 
-When we used (100,100,100,100), it means we want the top left coordinate of the rectanble to be one hundred pixels from the left hand side of the window and 100 pixels DOWN from the top of your window. Those coordinates are "local coordinates" relative to the Window. The job of the Graphics object g is to convert those local coordiantes to "global screen coordinates". So all the drawing functions in Swing need a Graphics object. 
+When we used (100,100,100,100), it means we want the top left coordinate of the rectangle to be one hundred pixels from the left hand side of the window and 100 pixels DOWN from the top of your window. Those coordinates are "local coordinates" relative to the Window. The job of the Graphics object g is to convert those local coordiantes to "global screen coordinates". So all the drawing functions in Swing need a Graphics object. 
 
 Let us change the numbers to be something different from all 100s.
 
@@ -483,13 +481,13 @@ Just change the word fill to draw and run your app again. Notice that instead of
 
 --drawOval(x,y,w,h)
 
-Change the word Rect to Oval and run. No supprise you get an elipse that fits into the same space as the rectangle.
+Change the word Rect to Oval and run. No surprise you get an ellipse that fits into the same space as the rectangle.
 
 --fillOval(x,y,w,y)
 
-No surprise this function fills the interior of the elipse.
+No surprise this function fills the interior of the ellipse.
 
-Now for a functiont that requires two points. It draws a Line segement in the current color between thet two points.
+Now for a function that requires two points. It draws a Line segment in the current color between the two points.
 
 --drawLine(x1,y1,x2,y2)
   
@@ -507,13 +505,13 @@ Add a line after your oval
   
   g.drawString("Dude", 400,200);
   
-Run the app and you should see the word "Dude" on the screen at the desired coordinates, though actually you can't see where those coordinates are. Let' clean that up with some local variables:
+Run the app and you should see the word "Dude" on the screen at the desired coordinates, though actually you can't see where those coordinates are. Let's clean that up with some local variables:
 
   int x = 400, y = 200; String msg = "Dude";
   g.drawString(msg,x,y);
   g.drawOval(x,y,3,3); // 3 is just a small number to make a small dot
   
-Run it and look where the dot shows up. Notice that it is NOT located at the upper-lefthand corner of the bounding box where the String shows up. Instead it is located at the baseline of the text. This is for the convenience of building things like word processors - English text sits on top of the lines on lined paper. Text is aligned at the base line.
+Run it and look where the dot shows up. Notice that it is NOT located at the upper left-hand corner of the bounding box where the String shows up. Instead it is located at the baseline of the text. This is for the convenience of building things like word processors - English text sits on top of the lines on lined paper. Text is aligned at the base line.
 
 ==Text Alignment
 
