@@ -125,15 +125,13 @@ Quite frankly, white space is for kids. I want to see as much code as I can poss
 (Side note: My style is NOT standard Java convention. I have been polluted by also writing a lot of JavaScript. I have my own style and since I now work alone I get to write in whatever style I like. I honestly believe that style is important, much like all driving on the same side of the road, but it is naieve to pretend that there is only one programming language, only one programming culture, only one programming style. A GOOD programmer should be flexible and be able to quickly adopt and adapt to any stylistic conventions that his team, group, company, or clan legislates. I am NOT attempting to teach you standard java style convention in these notes. I am attempting to teach you to be a cameleon. You should be flexible enough to be able to fit in anywhere. I WILL attempt in ALL places where I do NOT follow standard Java Style Conventions to point out what those conventions are as I dievate away from them.)
 
 ==project
-Since my goal in this course is to produce one single large project I created a project: music24.
+Since my goal in this course is to produce one single large project I created a project: NEU26W.
 
-(When I first launch IDEA, I get a screen that lets me select from existing projects or create a new one. I get several pages of choices most of which I don't understand so I just use the defaults and finally on the last one I get to type in a name: music24. I put the year that I started the project at the end of the project name. That is my convention.)
+(When I first launch IDEA, I get a screen that lets me select from existing projects or create a new one. I get several pages of choices most of which I don't understand so I just use the defaults and finally on the last one I get to type in a name: NEU26W. I put the year that I started the project at the end of the project name. That is my convention.)
 
 Standard java convention, which I am following here is this: Names that you make up (for classes, variables, functions, projects, interfaces, etc.) should ALWAYS start with LOWER case letters unless they are Class Names. This allows you to INSTANTLY recognize any name that is actually a class name. 
 
 And while instant recognition of class names is the THEORY, in practice conventional java style immediately violates it by also adopting an OLD C convention which is to use all caps to name any variable that represents a constant unchanging value, like PI=3.141592. So the instant recognition of class names is just a wee bit compromised. When you see a name "SHOUTED" (all caps) it is probably just a constant, if it was "Shouted", (with a leading cap), it is certainly NOT a constant and therefore MUST be a java class (or possibly a mistake - the java compiler neither enforces nor cares about java style conventions). 
-
-All of this noise about conventional capitalizsion style was just to let you know that the choice of "music24" was ever so slightly constrained by convention; I did NOT name it "Music24".
 
 ==packages
 
@@ -143,7 +141,7 @@ To be honest in many projects you have no idea how you want to organize all your
 
 This used to be an important step, because once you started writing files and placing them in directories, it was work to change that decision. 
 
-Java requires that you put code (a package statement) in every class file telling which directory it lives in so that the compiler can understand your directory structure as it reads your files. If you use a bad directory structure and want to move a file (or move a large bunch of files, or even just want to rename a directory) you have to open up each file and chage a line of code in it.  
+Java requires that you put code (a package statement) in every class file telling which directory it lives in so that the compiler can understand your directory structure as it reads your files. If you use a bad directory structure and want to move a file (or move a large bunch of files, or even just want to rename a directory) you have to open up each file and change a line of code in it.  
 
 Modern IDEs now make this sort of refactoring fairly simple. You tell the IDE to move some files and it changes the code to match. So now days one need not agonize over the directory structure when starting a project. If you detect a better structure somewhere down the road you just change it.
 
@@ -153,15 +151,16 @@ Your directory structure is a very rough organizational tool, just like manila f
 
 The important thing to understand about organizational tools is that they DO have a purpose, and that purpose is to help you FIND things. I don't care WHERE you put that ibm contract. You are trying to find it. Where did YOU put it? Where did your co-worker put it? No one cares where or how you file things or how you name your folders. The thing that you DO care about is how much thinking either you or your co-worker needed to do in the future to figure out WHERE to file something when they are inserting it into the filing system and where to look first when trying to find it.
 
-Why am I gassing on about organizational tools? Because the sub-text of this entire course is that the DIFFERNECE between code that is only one page long is that you write it yourself it needs NO organization at all, but any mid size projects (one that you write by yourself over a long time so it is big) and any large size projects (developed by a team over a long time) are ALL about organization! 
+Why am I gassing on about organizational tools? Because the sub-text of this entire course is that the DIFFERENCE between code that is only one page long is that you write it yourself it needs NO organization at all, but any mid size projects (one that you write by yourself over a long time so it is big) and any large size projects (developed by a team over a long time) are ALL about organization! 
 
-So yes, you are free to completely ignore it if you are buidling something small. You can even ignore it at first on something mid-sized. Just start building stuff and once your desktop is too cluttered with papers you start placing things in folders. You can similiarly let your directory structure grow organically as your code base grows. But on a large scale project you really do need to spend a moment thinking about how you expect to deal with scale and start building a directury structure that that will support it.
+So yes, you are free to completely ignore it if you are building something small. You can even ignore it at first on something mid-sized. Just start building stuff and once your desktop is too cluttered with papers you start placing things in folders. You can similarly let your directory structure grow organically as your code base grows. But on a large scale project you really do need to spend a moment thinking about how you expect to deal with scale and start building a directury structure that that will support it.
 
-Since I have built this music project several times, I already have a pretty good idea of the structure that I will want. For this project we will use 4 packages: graphics, music, reaction, and sandbox. The "graphics" folder will hold classes that do the underlying drawing on the screen. These will be general tools that I could use on any project that has a 2D graphical interface. The "reaction" folder is for the holding all the classes that are used to do the gesture recognition that is the special UI that we will use for this project. It is also fairly general purpose, but it is NOT the traditional GUI so I wouldn't use it on all graphics application and thus I keep it in a different package. The "music" package is where I will keep things that are specificly for the music editor.
+Since I have built this music project several times, I already have a pretty good idea of the structure that I will want. For this project we will use 4 packages: graphics, music, reaction, and sandbox. The "graphics" folder will hold classes that do the underlying drawing on the screen. These will be general tools that I could use on any project that has a 2D graphical interface. The "reaction" folder is for the holding all the classes that are used to do the gesture recognition that is the special UI that we will use for this project. It is also fairly general purpose, but it is NOT the traditional GUI so I wouldn't use it on all graphics application and thus I keep it in a different package. The "music" package is where I will keep things that are specificaly for the music editor.
 
 The last one, "sandbox", is one that I almost ALWAYS put in any project that I build. It is a place for code that I don't care about. I often need to write code to test how something may or may not work, to try ideas out. That is what the sandbox is for. My general rule is that I can always hack up something in the sandbox. I can delete anything in the sandbox and I lose nothing that I care about long term. If I want to ACTUALLY keep something, I should put it in one of the other packages.
 
---create packages: graphics, music, reaction, sandbox
+--create packages react, sandbox
+--inside react create packages graphics, music, reactions
 
 To create a package in IDEA you can right click on the src folder over in the left hand pane. The top choice on the dropdown is New, and when you select that you get another dropdown from which you can select package (this is also the same dropdown that will let you define new java classes.)
 
@@ -169,7 +168,7 @@ In this first introductory section (I am guessing the first 3 or 4 days), where 
 
 Near as I can tell, in IDEA you see the project name in the leftmost navigation panel. You can open it up to see the src directory where all your source code is kept. When you open src you should see all your packages
 
-Just to see that you have things set up correctly you should build a Hello class in the sanbox as a test routine. 
+Just to see that you have things set up correctly you should build a Hello class in the sandbox as a test routine. 
 
 --Create class Hello in sandbox:
     
@@ -183,11 +182,11 @@ Just to see that you have things set up correctly you should build a Hello class
   }
 
 
-I am just starting to play with using Idea to connect to GitHub. I have a repo at Marlin314/Reactions that will eventually hold this entire project. Each time I do a commit to something that I think is runnable code I will put in a commit comment like this:
+I am just starting to play with using Idea to connect to GitHub. I have a repo at Marlin314/React26W that will eventually hold this entire project. Each time I do a commit to something that I think is runnable code I will put in a commit comment like this:
 
 -- Commit: Hello added to sandbox  
 
-Which tells you that you could go to Github, locate that commit, and have access to the code as it was at this point. Of course I have never actually done that and don't know how to do that but maybe someday I will figure it out.
+Which tells you that you could go to Github, locate that commit, and have access to the code as it was at this point. Of course I have never actually done that and don't know how to do that, but maybe someday I will figure it out.
 
 You should notice that in the margin of the code just to the left of the main routine AND just to the left of the class name there is a little green "play" triangle. There is also a little green "play" triangle up in the toolbar at the top. Click on the one in the margin first. When you do that, not only will it play the file, but it will also populate a dropdown box up in the toolbar with the name of the "palyable" file. The green button up in the tool bar plays the file selected in the dropdown box. Once you have boosted your file into the dropdown, you do not need to tab around among multiple files to find the one that you can actually play.
 
