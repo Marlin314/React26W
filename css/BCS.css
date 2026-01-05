@@ -1,0 +1,47 @@
+html {overflow-y: scroll; font-family: 'Quando', sans-serif; color: #000; font-weight: 1em;}
+body {padding: 0px;}
+
+h1 {margin:  0px 0px 20px 0px; fontsize:1.75em; font-weight:bold;}
+h2 {margin:  0px 0px 20px 0px; fontsize:1.50em; font-weight:normal;}
+h3 {margin: 10px 0px 10px 0px; fontsize:1.35em; font-weight:bold;}
+
+.inText{background-color:#eee; padding:10px 0px 10px 0px;} /* default style for blocks of indented text */
+
+.BookMenu {background-color:#555; width:100%; position:relative; top:-8px;}
+.SectionMenu	{background-color:#555; width:100%;height:40px;}
+.Names {background-color:#555; overflow:hidden; width:80%;}
+.Buttons {background-color:#555; float:right;}
+.ButtonStyle {margin: 7px 10px 0px 0px; border: 4px #ccc solid; background-color:#eee; font-size:14px; font-weight:bold; color:#555;}
+.BookTog	{color:#fff; background-color:#555; padding:10px; float:left; display:block;}
+.ChapterName	{color:#fff; background-color:#b33; padding:10px; float:left;}
+.SectionName	{color:#fff; background-color:#3b3; padding:10px; float:left;}
+
+.sLink {color:#b33;}
+.sLink:hover {color:#600;}
+.ClearFloats {clear:both;}
+
+.SectionContents {margin: 60px 30px 30px 30px;}
+
+.n {color:#D567EB;}
+.i {font-style: italic;}
+.b{font-weight: bold;}
+.g{color:#CCC;}
+
+.chapters {margin-left: 6px;}
+.chapters li {margin: 6px 0px 0px 0px;}
+
+.restart {position:absolute; top:55px; left:9px; color:#fff; background-color:#3b3; padding:10px; width:500px; text-align:center;}
+
+.GitCheckpoint {
+  border-left: 4px solid #dd3;
+  background: #f7f7f7;
+  padding: 0.5em 1em;
+  margin: 1em 0;
+  font-size: 0.9em;
+}
+
+.GitCheckpoint pre {
+  background: #eee;
+  padding: 0.5em;
+  overflow-x: auto;
+}

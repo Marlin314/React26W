@@ -1,0 +1,33 @@
+.java, .js{background-color:#eee; padding:10px 0px 10px 0px;} /* entire code block is in a div of class java so pale background*/
+
+.JKW{font-family:"Verdana";} /*All java keywords have this class*/
+
+/* keywords are then grouped into somewhat functional classes so that we can color them differently
+   if you look in the styling parser "JavaFstHtm.js" you will see the split into color groups (and
+   of course if you don't like my groups, you can shuffle words among groups, create new groups or
+   coalesce them over in that file)
+
+  // first some class level keywords:
+  clsForWords('JC', 'static class abstract throws interface extends implements instanceof Override import package');
+  clsForWords('JG','if else for while switch case default try catch finally');  // control words generally GO somewhere
+  clsForWords('JX','break continue throw goto return'); // words the eXit
+  clsForWords('JTF','true false null final'); // True/False and other Constants
+  clsForWords('JN','new native strictfp synchronized transient volatile'); // Strong accent for new (and words that I never use!)
+  clsForWords('JV','void this super'); // Void and other somewhat neutral words
+  clsForWords('JPR','int boolean float double long char byte short'); // Primitives
+  clsForWords('JPP','public private protected'); // visibility modifiers
+
+*/
+.JC{color:orange;} .JG{color:#6cf;} .JX{color:#6cf;} .JTF{color:teal;}
+.JN{color:fuchsia;} .JV{color:gray;} .JPR{color:maroon;} .JPP{color: gray}
+
+.JQ{color:teal;} /* Quoted text strings "..."  */
+.JT{color:teal;} /* Ticked char strings '...'  */
+
+.JB, .JE{font-family: "Times New Roman"; color:#bbb;} /*Block comments and EOL comments - good reading font and neutral color*/
+
+.MKS{color:gray;font-style: italic;} /* MySQL keywords */
+
+.JCAPS {color:teal;} /* Identifier all caps suggests constant, like a quoted string*/
+.JFirstCap{color:maroon;font-family:"Comic Sans MS"; font-weight:bold; } /* FirstCap suggest class name hence a type */
+.Jword{color:blue;font-family:"Comic Sans MS"} /* normal identifer so function name or member variable */

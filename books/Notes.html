@@ -1,0 +1,149 @@
+<!DOCTYPE html><html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+
+    <link href='http://fonts.googleapis.com/css?family=Quando' rel='stylesheet' type='text/css'>
+    <!-- BCS style sheet and code to produce this Book-Chapter-Section document-->
+    <link href='../css/BCS.css' rel='stylesheet' type='text/css'><script src="../js/BCS.js"></script>
+
+    <script>window.onload = function(){getMarkdown('daBook'); startBook();}</script>
+    <!-- This book uses Java examples so I load the Java style sheet & parser and install the encoder -->
+    <link href='../css/JsAndJava.css' rel='stylesheet' type='text/css'><script src="../js/JavaToHtm.js"></script>
+    <script>indentEncoders['java'] = javaToHtml; /* javaToHtml defined in JavaFstHtm.js */ </script>
+
+    <title>BCS sample</title>
+</head><body>
+<div id="stuff">dude, javascript must be, like, turned on.</div>
+
+<!-- You should change the title above to be your book title, then put all your BookMarkdown in this ginormous script block-->
+<script id="daBook" type="BookMarkdown">
+
+::B BCS-BookChapterSection
+::C User Info
+::S Intro
+==BCS BookChapterSection Intro
+BCS is a markdown system that I wrote years ago pretty much before markdown existed. It was just my own version of avoid having to write in HTML when I built my course notes. As a user you do not need to learn anything about the markdown system itself. As far as you are concerned this is just a book viewer.
+
+The design is farily simple and obvious with one obscure trick which I will mention last. You will see that there are Next and Prev buttons at both the top and the bottom of the page. Each page is a single section of the book and those next and prev buttons take you forward one section or back one section. That is all. There are no book marks, there is no way to remember where you are, there are no breadcrumbs. The only navigation that you normally have available is to take one step forward or one backward. The one exception is the table of contents.
+
+--Table of Contents
+When you first start the book you are on a special page, the Table of Contents. This is just a vertical list of Chapter names, and each chapter name is followed by a horizontal list of Section names. Those section names are links that allow you to hop to any particular section. This is how you get around quickly in the book.
+
+The system starts in Table of Contents mode but as soon as you click a section you move into Book mode where you can only go forward and back. How do you get BACK to Table of Contents mode?
+
+--The UnObvious Button
+The title bar, which shows you the Book name, the Chapter name, the Section name, has a hidden button. Just click on the Book name and it resets to Table of Contents mode. Clicking the Book name essentially closes the book, takes you back to start.
+
+::C Under the Hood
+::S A brief look
+
+==BCS - a Brief Look
+BCS - stands for Book Chapter Section, which is a markdown system that I created about a decade ago when I was trying to teach some java. I wanted to put my java code samples on line for my students to look at, and at that time there were very few resources that would help so I wrote my own.
+
+The name !nBCS captures the !inotion that I decided rather !barbitrarily that I could live with exactly 3 levels of hierarchy. I could write independent books, each one living complete in a single html file. The book itself would be divided into chapters, and each chapter would be divided into sections.
+
+That 3 level hierarchy allowed a couple things. For one I could pass a book on to someone as a single file. Well, technically of course that file depends on a few javascript files and some css style sheets in order to display properly, but once you have the files that make up the engine, the contents of the book do live in a single file. So you can easily make a copy of a book for a friend.
+
+The Chapters and Sections allowed me to produce a single simple Navigation page, which is the Table of Contents. It is of course a vertical list of Chapter names, with the Section names listed horizontally after each Chapter name. With a click (on the name of the book) you can get to the Table of Contents, and a click on a Section name takes you to that section.
+
+Can you bookmark where you are? Nope. Does it remember a stack of how you navigated through the book so that you can Undo? Nope. It does nothing fancy, It just has !bprevious and !bnext buttons that let you go through the book in reading order. The Table of Contents is the Only navigation beyond the next and prev buttons.
+
+--Can I have sub-section?
+==Can I?
+++Really?
+Yes of course. HTML has headers. I let you add headers. HTML has 5 I use 3. Good enough.
+
+HTML has !italics and !bbold text. Sure, no problem. I have !npurple_text too, a color I selected arbitrarily to represent new vocabulary words when I drop them into the text.
+
+But of coure, the whole point of BCS was so that I could show code examples:
+
+::I java
+  class Foo implements Bar{
+    public String name = "Bob";
+    private int age = 19;
+  }
+
+Wow! look at that. Java code all false colored like in a real IDE, so you can see what is going on.
+
+==Can I write my own Books?
+Yes of course. To see how, read the next section.
+
+::S How da Magic works
+==How da Magic works!
+I did the same sort of thing that was done with markdown. I didn't do it quite the same way. I had different goals so they did more work to map markdown strategies to everything that you could do in HTML. What I did is more of a kludge that was easy to build quickly. They wanted you to be able to read markdown format even if you didn't have a markdown processor to render it correctly. I don't care about that. My system is more limited and as a result simpler. It is simpler because there is less that you can do. Less really is more.
+
+If you open up and look at the html file in a text editor, you will find that standard HTML garbage that you need to start a page, and you will see the places where I locate and load the javascript and the css files, and then you will see an enormous script section. That script section contains the entire text of the book written in my psuedo-markdown format.
+
+I decided that the FUNDAMENTAL thing that you are doing with your text is writing ONE paragraph after another. You just type, type and at the end of a paragraph you finally hit the enter key (maybe twice to leave a blank line). So the text that you type into that script section can basically be split into CHUNKS at every place that you typed in ENTER.
+
+Once I have a list of CHUNKS, I look at the first 2 characters of a chunk and I use those two characters to decide HOW I want to format that chunk. The most fundamental decision is that if the first two letters are two blank spaces, i.e. indented text, why that means that you are entering computer code, so you want it indented, false colored, special font, special background, and if you DON'T start with two spaces, it is probably just a regular paragraph of text.
+
+The exceptions to regular paragraphs are new lines that you start with :: or ++ or == or --
+
+==Starting new Chapters and Sections
+If you start with :: You can write a single line like ::B name of book, then a new single line that is ::C name of chapter,  then a new single line ::S name of section, then a new single line ==Dude this is a title, or perhapes you wanted that title bigger ++Biger or --Smaller.
+
+That is just about EVERYTHING that you can do. The only other thing that I did is throw in a way to emphasize a !isingle word (or a !icouple_words ) in a paragraph.
+
+==Bang Styling
+I called that method BangStyling in my code cause it looks like this: <span>!iDude</span>. You type that to italicize Dude !iDude.
+
+Exclamation point is called 'bang' by some programmers. In normal use in normal English, exclamation point comes at the end of a sentence, like this! There was a Non-space character immediately before the bang, and there was a space immediately after. I decided that if I saw a space character followed immediately by a bang followed immediately by some non-space character then what you REALLY wanted was a span whose class was the single character immediately after the bang character.
+
+So bang-i means italic, bang-b means bold, bang-n means this is a new word so color it purple. Maybe I defined bang-r to mean red, but maybe not. You would need to look in the css file to see what I did.
+
+You see, bang-i really means "apply the css class .i to this small set of words." So if you change the css file for .i you will change what bang-i does, not that changing the meaning of bang-i is a good idea.
+
+More importantly, perhaps, it means that if you need to EMPHASIZE words in what ever book you want to write with YOUR font, in YOUR size, in YOUR special color, You can of course choose an unused letter like z, add a single line into the CSS file that has the style you want and then when you bang-z style a word you get YOUR special emphasis.
+
+Oh yeah, if you want !nseveral_words stylized use an underscore between the words. The bang styler will convert underscores to spaces.
+
+The bang-styler assumes that you stop at spaces and punctuation so !nnewWord? does not italicize the question mark. If you WANTED the ? to be italicized like !nnewWord?_ you need to follow the question mark with an underscore so that the bang-styler knows that the words you are emphasizing continue past the question mark. Also beware, minor glitch, if you start a paragraph with !nfoo it doesn't style correctly because the first two chars of the paragraph were special. Just put a space in front, it is still a standard paragraph, the space is removed and the styling works. If you want to fix my java script, go ahead, have at it!
+
+::S Warning!
+==Warning
+So yeah try it out. See how easy it is to write an online book talking about your java code. !bBUT, I'd be remiss if I did not pass on this warning.
+
+You can use this system to document your code, and explain how you developed it. "Go here and change this", "Modify the constructor of this class to include this". But if you do so, you may end up deciding, as I did, that there is almost NO need to include comments in your code at all.
+
+My code commenting suffered once I had this better way to comment code. What code commenting is good at, is telling you, this one chunk right here does this one thing. What my BCS system is allow you to write a diary that describes in what order you wrote what pieces of your code so that you can document the development process, so you can write a simple function that does a simple thing, and then you can modify a data structure so that it now does this extra thing and then you can go augment that function to deal with the extra data. Does anyone NEED all of that process documented? Well, yes, beginners do. Beginners have no idea of what code to look at first when confronted with a mess of fifty or a hundred classes. Why not walk them through the process in which the classes were developed, and tested and show them the evolution, and NOT just the final result.
+
+So I am now more inclined to use BCS as my documentation system for any java project that I develop. 
+
+::S One more thing
+==Oh yeah, almost forgot
+::I text
+  sometimes you want to show some vanilla text
+  like for example text that is NOT code, but is
+  the text that the computer spewed out to the terminal
+  when you ran the code.
+
+You need some way to do that, or rather I needed someway to do that. So after building the system to take indented paragraphs and style them up as JAVA code. I realized that I need to tell the indent/code stylizer what kind of code you are looking at. I need to tell it that indented coe is java, ::I java  or that it is plain text, ::I text or that it was javascript, ::I js or some other language.
+
+Basically you can create different CodeToHtml.js stylizers that can parse Java code or C code and do the right false color thing for that language. If you type in the single line ::I text, then indented code is styled as plain text and not java until you switch the indent processor back to being java.
+
+There are NO DOUBT other features of this FANTASTIC BCS markdown kludge that were lovingly implemented and then entirely forgotten. So it goes. You may certainly use it as is OR now that you know how trivial it is to kludge up your own markdown system in just a couple hundred lines of javascript code you could just go build one that will suit your OWN purposes better than this.
+
+All right, all right, I know I did NOT put in any markdown code for tables. Who needs tables? But I did occasionally use lists so yeah, I looked back through the code and saw what I did to produce a list.
+-- a list of fruit
+
+0. apple
+2. banana
+2. cherry
+3.
+
+1. numberd lists
+2. are also
+2. easy
+3.
+
+Remember the first two characters of a chunk (a new paragraph) dictate the format of that chunk so, A list STARTS on a paragraph where the first two letters are 0. at the front, so "0. apple" was the first line of that UNORDERED LIST. 
+
+"1. apple" would be the start of a NUMBERED list. 
+
+After the first two letters which tell what type of list you need, the subsequent lines ALL start with the letters "2." And last but not least, you close a list with a line that is blank except for the first two letters 3.
+
+So there ya go. If you do want to use this. Just open up the BCSsample.html file that is THIS BOOK in a text editor, see how what I typed here shows up in different chapters and sections. Then throw out my text and write your own.
+
+++Enjoy!
+
+</script>
+</body></html>
