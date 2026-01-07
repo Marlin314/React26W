@@ -921,7 +921,7 @@ Much like we did in our paint class, we want our squares app to keep track of a 
   public static class Square extends G.VS{
     public Color c = G.rndColor();
     public Square(int x, int y){super(x,y,100,100);}
-    public void draw(Grpahics g){fill(g,c);}
+    public void draw(Graphics g){fill(g,c);}
     
     //------------------List----------------------------
     public static class List extends ArrayList<Square>{
@@ -933,14 +933,17 @@ You can see that we have fixed our square size at 100 by 100 (more magic numbers
 
 In order to verify that we can construct and paint squares modify paintComponent and mousePressed like this:
 
+--add a list of squares
   public static Square.List squares = new Square.List();
     
+--change paintComponent to show squares    
   @Override
   public void paintComponent(Graphics g){
-    G.fillBack(g);
+    G.clearBack(g);
     squares.draw(g);  
   }
   
+--add mousePressed that creates squares  
   @Override
   public void mousePressed(MouseEvent me){
     squares.add(new Square(me.getX(), me.getY()));
@@ -948,6 +951,8 @@ In order to verify that we can construct and paint squares modify paintComponent
   }
 
 With these changes, we can now click anywhere and create and new square of some random color.
+
+--Commit: Click to create a Square
 
 By the way, just because I am looking at the code in mousePressed, I see another thing that I could have done differently in my Square.List class. I could simplify the code in mouse Pressed by complicating the class Square.List. Since I am almost for sure ONLY going to add new Squares to the list. I could write a function that does that
 
