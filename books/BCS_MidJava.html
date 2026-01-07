@@ -714,8 +714,8 @@ This is the version of Paint that keeps a list of polylines
 
   package sandbox;
   
-  import graphics.G;
-  import graphics.WinApp;
+  import react.graphics.G;
+  import react.graphics.WinApp;
   import java.awt.*;
   import java.awt.event.MouseEvent;
   import java.util.ArrayList;
@@ -779,6 +779,8 @@ This is the version of Paint that keeps a list of polylines
     }
   }
 
+We add A Pic nested class, we added a Pic object, thePic, we modified mousePressed to create a new Path and add it to thePic. This lets us have multiple lines in Paint.
+ 
 --Commit: Paint supports multi-line with Pic
 
 ::C Basic Graphics
@@ -830,15 +832,22 @@ The activities that we are going to do are rubberband rectangles, rubberband lin
 
 So let's get started. 
 
+First we add a static function to clear the screen. We did this by hand once, but we will need it again and again so we put the helper in G.
+
+--add clearBack();
+  public static void clearBack(Graphics g){g.setColor(Color.WHITE); g.fillRect(0,0,5000,5000);}
+
+Yes, there are two GROSS magic numbers in that function. I am going to leave them. I am going to deal with magic numbers a bit later. Those numbers have no meaning other than to be bigger than any screen coordinates that you are likely to ever see. I could have set them to MAXINT. 5000 should be good enough.
+
 ::S Hit Detection
 == Hit Detection
 
 Hit detection is almost always done on rectangles because it is so easy. You just make sure that the mouse x is between the left and the right side of the rectangle and you make sure that the y is between the top and the bottom of the rectangle.
 
-As discussed we will build some helper classes in G for points (V) and rectangles (VS). Add this to G:
+As discussed we will build some helper classes in G for points (V) and rectangles (VS). 
 
-  public static void fillBack(Graphics g){g.setColor(Color.WHITE); g.fillRect(0,0,3000,3000);}
-    
+--define V and VS in G
+
   public static class V{
     public int x,y;
     public V(int x, int y){this.set(x,y);}
@@ -853,16 +862,12 @@ As discussed we will build some helper classes in G for points (V) and rectangle
     public boolean hit(int x, int y){return loc.x<=x && loc.y <=y && x<=(loc.x+size.x) && y<=(loc.y+size.y);}
   }
   
-That first static function is a recognition that we almost always want to start our paintComponent by clearing off the panel and setting the background color.
-
-Yes, there are two GROSS magic numbers in that function. I am going to leave them. I am going to deal with magic numbers a bit later. Those numbers have no meaning other than to be bigger than any screen coordinates that you are likely to ever see. I could have set them to MAXINT. I like 3000.
-
 You will see that the class VS made use of the class V, and that the class VS has the hit detection code.
 
 And now that I think about it. How totally bogus was it to NOT use that cool VS helper class when I was clearing out a large rectangle to fill the background. Wouldn't it have been way cooler to do it like this?
 
   public static final VS BACKGROUND_RECT = new VS(0,0,3000,3000);
-  public static fillBackground(Graphics g, Color c){BACKGROUND_RECT.fill(g,c);}
+  public static fillBack(Graphics g, Color c){BACKGROUND_RECT.fill(g,c);}
 
 Well it's your G class. It's your choice. But in either case we need to test it. 
 
@@ -873,29 +878,30 @@ We are going to write a new application called Squares and we will used that nex
 
 Let us create a new toy WinApp: 
 --build Squares in sandbox
-
   package sandbox;
-  import graphics.WinApp;
-  import graphics.G;
+  import react.graphics.*;
   
   public class Squares extends WinApp{
     public Squares(){super("Squares",1000,800);}
-    public static void main(String[] args){PANEL=new Squares();WinApp.launch();} 
+    public static void main(String[] args){PANEL=new Squares();WinApp.launch();}
   }
   
-Add a static VS and Color. Build a paintComponent that will clear the background and fill theVS with the color. 
+Create a VS and color and build a paintComponent that will clear the background and fill theVS with the color. 
 
+--add a static VS and Color
   public static G.VS theVS = new G.VS(100,100,200,300);
   public static Color color = G.rndColor();
-  
+
+--create paintComponent  
   @Override
   public void paintComponent(Graphics g){
-    G.fillBack(g);
+    G.clearBack(g);
     theVS.fill(g, color); // give us a nice Rect
   }
   
-Add a mousePressed that will change !icolor IF the mouse press HIT !itheVS
+Then add a mousePressed that will change !icolor IF the mouse press HIT !itheVS
 
+--add mousePressed()
   @Override
   public void mousePressed(MouseEvent me){
     if(theVS.hit(me.getX(), me.getY())){color = G.rndColor();}
@@ -903,6 +909,8 @@ Add a mousePressed that will change !icolor IF the mouse press HIT !itheVS
   }
   
 Test it out. Does it work? Presumably when you click on the box it changes color, when you click elsewhere nothing happens.
+
+--Commit: Test Hit Detection
 
 ::S Many Squares
 ==Many Squares
