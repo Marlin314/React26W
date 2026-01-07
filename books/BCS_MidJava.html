@@ -605,8 +605,6 @@ Resize your window. Is the message correct now? It should be. Our problem was th
 
 With that fix, presumably now when you click your mouse the screen is now dynamically updating and showing the proper click count.
 
---Commit: Show count of mouse clicks
-
 OOPS! not quite. The count string is now drawing numbers on top of the numbers that it drew from the last time that it painted. It is not clearing the screen before it paints the new result. Generally the first thing that you want to do in your paintComponent is to clear everthing off so that you are starting from a clean screen. Add this as the first line:
 
   g.setColor(Color.WHITE); g.fillRect(0,0,9000,9000);
@@ -614,13 +612,16 @@ OOPS! not quite. The count string is now drawing numbers on top of the numbers t
 Wait, What? You saw no bug on your mac? What is he talking about? Was Marlin developing on a PC?
 
 --Mac vs PC
-You may find yourself wondering about the oops that I just mentioned and the need to fill the screen with white at the front of your paint proc. The reason is, that this BUG that I mentioned, is actually a difference between the Windows operating system and the Mac operating system and the way that they deal with screen windows. Windows on the PC does NOT clear the screen for you before they call your paint proc. Apple DOES clear the screen. So if you put the clear into your code, then your code will work corectly on both systems. If you leave it out, it may work and it may not depending on which system you run your code on.
+You may find yourself wondering about the oops that I just mentioned and the need to fill the screen with white at the front of your paint proc. The reason is, that this BUG that I mentioned, is actually a difference between the Windows operating system and the Mac operating system and the way that they deal with screen windows. Windows on the PC does NOT clear the screen for you before they call your paint proc. Apple DOES clear the screen. So if you put the clear into your code, then your code will work correctly on both systems. If you leave it out, it may work and it may not depending on which system you run your code on.
 
 I could point fingers, blame Windows for their stupid code (which is of course MY fault!) or blame Apple because they waste time by assuming that I want the screen cleared before every single call to paintComponent, or I could blame the writers of the Java swing code for NOT noticing this difference between the Mac and the PC and fixing Swing so that it really does work as close to identically on their two main platforms.
 
 But the sad truth is, that in the world of code, assigning blame accomplishes NOTHING. If the code does not work, laying blame on the disgusting tools and libraries and development system that you had to work with fixes NOTHING. YOU are responsible for all the testing of the code you write and if it doesn't work, it is YOUR problem and YOUR bug, even if you didn't put it there.
 
-Oh, and by the way, setting the color to WHITE also fixes the fact that Windows and Macs use different default background colors.
+Oh, and by the way, setting the color to WHITE also fixes the fact that Windows and Macs use different default background colors. So the color White fixes the wrong color on the Mac, and clearing the screen fixes the omission of clearing on Windows. Two OS inconsistencies fixed in a single line, a trivial fix but hard to notice if you don't test on multiple hardware platforms.
+
+--Commit: Show count of clicks on White bkg
+
 
 ::S Polylines
 ==Polylines

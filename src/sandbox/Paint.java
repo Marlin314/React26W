@@ -10,6 +10,7 @@ public class Paint extends WinApp {
 
   @Override
   public void paintComponent(Graphics g){
+    g.setColor(Color.WHITE); g.fillRect(0,0,9000,9000);
     Color c = G.rndColor();
     g.setColor(c);
     g.fillOval(100,50,200,300);
