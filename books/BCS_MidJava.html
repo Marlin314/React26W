@@ -640,34 +640,37 @@ Add the following NESTED class to your Paint class. Basically go down the the en
     }
   }
   
-I use static nested classes a lot. They are useful for controlling name spaces. I will however defer explaining what they are and why we use them until later - however I especially emphisize the word "static". Until I say otherwise ALL nested classes should be static. Before this course is over we will also use non-static ones but until I say so ALWAYS make any nested class static.
+I use static nested classes a lot. They are useful for controlling name spaces. I will however defer explaining what they are and why we use them until later - however I especially emphisize the word "static". Until I say otherwise ALL nested classes should be static. Before this course is over we will also use non-static ones but until I say so, ALWAYS make any nested class static.
 
-The important thing about static nested classes is that they behave EXACTLY like a normal class that you define off in a file all by itself. The only real difference between a nested class and a standalone class is that a nested class essentially has two names, a short name that can be used in the surrounding class, and a full name that must be used by any outside class that wants at the nested class. 
+The important thing about static nested classes is that they behave EXACTLY like a normal class that you define off in a file all by itself. The only real difference between a nested class and a standalone class is that a nested class essentially has two names, a short name that can be used inside the surrounding class, and a full name that must be used by any outside class that wants at the nested class. 
 
-In general, if you nest Bar inside Foo, within Foo you can used the class Bar, but in any other class you use the class Foo.Bar and that is the feature that I like - I like being able to essentially add a dot into the name of a class. 
+In general, if you nest Bar inside Foo, within Foo you can use the short name, Bar, but in any other class you must use the full class name, Foo.Bar, and that is the feature that I like - I like being able to essentially add a dot into the name of a class. 
 
 In this particular case, within the Paint class we can use the short name Path, but if some class other than Paint wants to used this class it must use the full name which is Paint.Path.
 
-Typically you use static nested classes when the ONLY consumer of the class is the surrounding class. In other words, the Nested class is a helper class for the surrounding class and is ONLY used in the surrounding class. You would often make it private, jowever that is not a requirement. A public static nested class can be used by any other class and you can think of it as just a class that happens to have a dot in its full name.
+Typically you use static nested classes when the ONLY consumer of the class is the surrounding class. In other words, a Nested class is a helper class for the surrounding class and is ONLY used in the surrounding class. You would often make it private, however that is not a requirement. A public static nested class can be used by any other class and you can think of it as just a class that happens to have a dot in its full name.
 
 Our Path is just an ArrayList of Point. Point is a java.awt class that holds coordinate pairs, so you can talk about p.x and p.y.
 
-Because our Path is just an ArrayList, if we create no constructor for this class we get the default constructor for an Array list which just creates an empty list which is want we want. Being an ArrayList we also immediately get to inherit all those nice functions that come with ArrayLists like add() which will add a new item (in this case a new Point) to the list and size() to tell us how long the list is.
+Because our Path is just an ArrayList, if we create no constructor for this class we get the default constructor for an ArrayList which just creates an empty list, which is want we want. Being an ArrayList, we also immediately get to inherit all those nice functions that come with ArrayLists like add() which will add a new item (in this case a new Point) to the list and size() to tell us how long the list is.
 
 We have built one single function for our Path class, the draw() routine which connects the dots. Notice that the for loop starts at 1 not at zero! That is because there is one less line segment than the number of points on the list - so we start the loop at 1 and then we back up by 1 to get the previous point which was at 0. Each time through the loop we draw from the previous point to the next one (the current one).
 
 This business of starting at 1 is often an indication that you are dealing with gaps between items on a list. If you put commas in the gaps between 3 words you will need 2 commas, the number of commas that you need to print is one less than the number of words.
 
-Now that we have a helper class to hold a single polyline/path we modify Paint to have a variable to hold a single path
+Now that we have a helper class to hold a single polyline/path, we modify Paint to have a variable to hold a single path
 
+--add to Paint
   public static Path thePath = new Path();
 
 And we insert a line into the paintComponent to draw that path.
 
+--add to paintComponent()
   thePath.draw(g);
 
-We modify our mousePressed routine so that it clears out the previous path and adds the location of the press event to start a new path
+We modify our mousePressed routine so that it 1) clears out the previous path and 2) adds the location of the press event to be the first point of thePath
 
+--replace mousePressed()
   @Override
   public void mousePressed(MouseEvent me){
     clicks++;
@@ -678,6 +681,7 @@ We modify our mousePressed routine so that it clears out the previous path and a
 
 And finally we now override mouseDragged to make sure that every time the mouse moves we add a new point to the growing daPath
 
+--add mouseDragged()
   @Override
   public void mouseDragged(MouseEvent me){
     thePath.add(me.getPoint());

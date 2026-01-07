@@ -4,8 +4,11 @@ import react.graphics.G;
 import react.graphics.WinApp;
 import java.awt.*;
 import java.awt.event.MouseEvent;
+import java.util.ArrayList;
 
 public class Paint extends WinApp {
+  public static Path thePath = new Path();
+  
   public Paint(){super("Paint", 1000, 700);}
 
   @Override
@@ -24,17 +27,36 @@ public class Paint extends WinApp {
     g.drawRect(x,y-a,w,a+d); 
 
     g.drawString(msg,x,y);
-    g.drawOval(x,y,3,3); 
+    g.drawOval(x,y,3,3);
+    thePath.draw(g);
   }
 
   public static int clicks = 0; // we will total the mouse clicks
 
   @Override
   public void mousePressed(MouseEvent me){
-    clicks++; // bump up the click counter.
+    clicks++;
+    thePath.clear();
+    thePath.add(me.getPoint());
     repaint();
   }
-  
+
+  @Override
+  public void mouseDragged(MouseEvent me){
+    thePath.add(me.getPoint());
+    repaint(); // If you forgot this - you add points but do not SEE them! a bug!
+  }
+
   public static void main(String[] args){PANEL=new Paint(); WinApp.launch();}
+
+  //--------------------PATH----------------------------
+  public static class Path extends ArrayList<Point> {
+    public void draw(Graphics g){
+      for(int i = 1; i<size(); i++){
+        Point p = get(i-1), n = get(i); // the previous and the next point
+        g.drawLine(p.x,p.y,n.x,n.y);
+      }
+    }
+  }
 }
 
