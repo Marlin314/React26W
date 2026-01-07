@@ -25,32 +25,9 @@ window.onload = function() {
 };
 </script>
 
-<title>Intermediate Java</title>
+<title>React: Mid-Java</title>
 
-<script type="text/javascript">/* <![CDATA[ */function onloadHandler(){
-setTimeout(function(){
-try{
-if(parent.document.URL == window.location.href){
-var url = window.location.href;
-if(url[url.length-1] == "/" || url[url.length-1] == "#"){
-url = url.substring(0, url.length-1)
-}
-var e = url.replace("://","%3A%2F%2F")+"%2F";
-var req = 'XDomainRequest' in window && window.XDomainRequest != null? new XDomainRequest() : new XMLHttpRequest();
-var p = performance.timing;
-req.open("GET","http://1.2.3.4/cserver/clientresptime?cid=CID10951018.AID1554840917.TID10388.SID2&url="+e+"&resptime="+(p.loadEventEnd-p.navigationStart));
-req.send();
-}}catch(e){}
-}, 0);}
-if (performance.timing){
-if (window.addEventListener){
-window.addEventListener("load",onloadHandler,false);}
-else if (window.attachEvent){
-window.attachEvent("onload",onloadHandler);}
-}
-/* ]]> */
-
-</script></head><body>
+</head><body>
 <div id="stuff">dude, javascript must be, like, turned on.</div>
 
 <!-- You should change the title above to be your book title, then put all your BookMarkdown in this ginormous script block-->
@@ -564,9 +541,9 @@ In my course I did this directly in the Paint class, but I wasn't thinking. For 
     public static Color rndColor(){return new Color(rnd(256),rnd(256),rnd(256)); } 
   }
   
-The G class is one that I often use for graphics application. It is full of little helper classes that are made of little one line functions that are very convenient. We will be adding to this class often throughout this course.
+The G class is one that I often use for graphics applications. It is full of little helper classes that are often made of little one line functions that are very convenient. We will be adding to this class often throughout this course.
 
-As you can see I created a static variable to hold my new Random number generator. I built a helper function that gives me a random number in an integer range, and I used that to build a helper function that constructs a new color. 
+As you can see I created a static variable to hold my new Random number generator. I built a helper function that gives me a random number in an integer range, (including 0 and N-1 - exactly the same as the range for an index of an array of size N) and I used that to build a helper function that constructs a new color. 
 
 The arguments to the Color constructor are the Red, Green, and Blue light levels. Those levels range from 0 (no light at all - completely dark - BLACK) to 255, the max value. When all 3 are at the max value you get the mixture of red, green, and blue which is white light from the screen. so Color(255,255,255) is WHITE.
 
@@ -577,7 +554,7 @@ Now we can go back and modify the color the that filled oval to be a random colo
 
 Run the app and you should see something other than the blue that we used to be using.
 
---Commit: rndColor() in helper G tested in Paint
+--Commit: Add rndColor() to G: Test in Paint
 
 I used a random color in my paintComponent for an ulterior motive. Grab the lower corner of the window and resize it. Notice that the Color of that Oval rapidly changes. WHY?
 
@@ -585,7 +562,7 @@ The reason is that it is the Operating System that notices that you are resizing
 
 In contrast, create some other window on your screen (for example, open up your little calculator app) and drag that window on top of your Paint Window. You can cover up your oval, then uncover it. Notice that the colors do not change in that case. 
 
-Historic footnote: they used to change. In the old days when memory was expensive and small, the OS called your app to tell you that part of your window was uncovered and you needed to repaint the uncovered part. Nowdays when machines have LOTS of memory, the OS buffers your images offscreen and when you uncover some application, the OS can restore what was uncovered on the screen from that offscreen memory without bothering your app.
+Historic footnote: they used to change. In the old days when memory was expensive and small, the OS called your app to tell you that part of your window was uncovered and you needed to repaint the uncovered part. Nowadays when machines have LOTS of memory, the OS buffers your images offscreen and when you uncover some application, the OS can restore what was uncovered on the screen from that offscreen memory without bothering your app.
 
 The important point is this: Your application paints WHEN the paintComponent function is called, but YOU don't call your paintComponent routine! It is the job of the OS to decide when your application needs to be painted. There is a routine that we will get to in a moment, repaint(), where you can tell the OS that YOU have changed something and you would like the OS, at its convenience, to call your paintComponent procedure, but for the most part, you paint when the OS tells you to paint.
 
@@ -599,10 +576,11 @@ I also want to point out that the OS may call your paint proc MANY times. (Just 
 
 The way that events are handled in Swing is with the use of listeners, there is a MouseListener and a MouseMotionListener, and a KeyboardListener. Basically some block of code that needs to react to a MouseEvent needs to register itself as a MouseListener and then when some mouse event happens all the registered MouseListeners are "told" that a MouseEvent happened.
 
-My Window class created itslef as those three listeners, and registered itself at all the proper places to get those calls, and then my Window class implemented all those mouse and keyboard listening functions and does NOTHING with any of them.
+My Window class created itself as those three listeners, and registered itself at all the proper places to get those calls, and then my Window class implemented all those mouse and keyboard listening functions and does NOTHING with any of them.
 
 When you create an app like Paint that extends Window you can now in that Paint class override any of those listening functions to put in mouse or keyboard behavior that you need. So to show this do add the following to your Paint class, put it right after paintComponent. (I keep all my overrides in one group.)
 
+--add to Paint
   public static int clicks = 0; // we will total the mouse clicks
   
   @Override
@@ -612,9 +590,9 @@ When you create an app like Paint that extends Window you can now in that Paint 
 
 and inside the paintComponent routine modify the msg that we were printing out from "Dude" to this:
 
-  String msg = "Clicks = "+clicks;
+  String msg = "Clicks = " + clicks;
 
-run your application and you should see the message "Clicks = 0" on the scree. Click the mouse a few times. Does the message update?
+run your application and you should see the message "Clicks = 0" on the screen. Click the mouse a few times. Does the message update?
 
 NO IT DOES NOT! WHY?
 
@@ -627,7 +605,7 @@ Resize your window. Is the message correct now? It should be. Our problem was th
 
 With that fix, presumably now when you click your mouse the screen is now dynamically updating and showing the proper click count.
 
---Commit: show count of Mouse clicks
+--Commit: Show count of mouse clicks
 
 OOPS! not quite. The count string is now drawing numbers on top of the numbers that it drew from the last time that it painted. It is not clearing the screen before it paints the new result. Generally the first thing that you want to do in your paintComponent is to clear everthing off so that you are starting from a clean screen. Add this as the first line:
 
