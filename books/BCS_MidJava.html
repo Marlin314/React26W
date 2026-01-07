@@ -963,9 +963,9 @@ Now I no longer need to create a new Square in mousePressed. Instead I call
 
   squares.addNew(me.getX(), me.getY());
 
-So why am I pointing this out to you? The reason is basically this: There are some folks in the OO community that seem to have some nearly religous belief that there is always a RIGHT decision to make in where you locate things, as if some how right thinking will always come to the same solution to any problem. These people are wrong! 
+So why am I pointing this out to you? The reason is basically this: There are some folks in the OO community that seem to have some nearly religious belief that there is always a RIGHT decision to make in where you locate things, as if some how right thinking will always come to the same solution to any problem. These people are wrong! 
 
-The whole notion of continuous refinement and continuous refactoring is simply expressing the notion that there is almost always some way to make your code better and that means that your code is NOT ever the best and never will be. Even if there WAS some notion of BEST, we are talking language here and convention amoung your listeners and readers, who could be born sometime in the next century, trumps whatever you thought was best today. There is no BEST, there is only BETTER and GOOD ENOUGH FOR RIGHT NOW.
+The whole notion of continuous refinement and continuous refactoring is simply expressing the notion that there is almost always some way to make your code better and that means that your code is NOT ever the best and never will be. Even if there WAS some notion of BEST, we are talking language here and convention among your listeners and readers, who could be born sometime in the next century, trumps whatever you thought was best today. There is no BEST, there is only BETTER and GOOD ENOUGH FOR RIGHT NOW.
 
 So even as I quickly and reflexively build things in ways that my experience tells me will work and will work well, I must still ask myself if I can make my code better. And so should you.
 
@@ -978,12 +978,15 @@ We are going to modify the User interface that we just created for our Squares a
 
 We will want to add a routine in Square to allow a mouse coordinate to resize the VS
 
+--add to Square
   public void resize(int x, int y){if(x>loc.x && y>loc.y){size.set(x - loc.x, y - loc.y);}}
 
-And then we need to implement the mouseDragged procedure so that it calls the resizing for the current square. To make it easier to size the current square we add a static Square daSquare, we set it on the mouse down, AND add it to the list, then we modify daSquare in the mouseDragged routine.
+And then we need to implement the mouseDragged procedure so that it calls the resizing for the current square. To make it easier to size the current square we add a static Square lastSquare, we set it on the mouse down, AND add it to the list, then we modify lastSquare in the mouseDragged routine.
 
+--add static lastSquare
   public static Square lastSquare;
   
+--upgrade mousePressed to capture the lastSquare  
   @Override
   public void mousePressed(MouseEvent me){
     lastSquare = new Square(me.getX(), me.getY());
@@ -991,12 +994,14 @@ And then we need to implement the mouseDragged procedure so that it calls the re
     repaint();
   }
   
+--add mouseDragged to resize  
   @Override
   public void mouseDragged(MouseEvent me){
     lastSquare.resize(me.getX(), me.getY());
     repaint();
   }
 
+--Commit: Create AND resize squares
 Give it a try! 
 
 ::S Dragging Boxes

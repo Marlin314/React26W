@@ -9,6 +9,7 @@ public class Squares extends WinApp{
   public static G.VS theVS = new G.VS(100,100,200,300);
   public static Color color = G.rndColor();
   public static Square.List squares = new Square.List();
+  public static Square lastSquare;
 
   public Squares(){super("Squares",1000,800);}
 
@@ -20,7 +21,14 @@ public class Squares extends WinApp{
 
   @Override
   public void mousePressed(MouseEvent me){
-    squares.add(new Square(me.getX(), me.getY()));
+    lastSquare = new Square(me.getX(), me.getY());
+    squares.add(lastSquare);
+    repaint();
+  }
+
+  @Override
+  public void mouseDragged(MouseEvent me){
+    lastSquare.resize(me.getX(), me.getY());
     repaint();
   }
   
@@ -31,6 +39,7 @@ public class Squares extends WinApp{
     public Color c = G.rndColor();
     public Square(int x, int y){super(x,y,100,100);}
     public void draw(Graphics g){fill(g,c);}
+    public void resize(int x, int y){if(x>loc.x && y>loc.y){size.set(x - loc.x, y - loc.y);}}
 
     //------------------List----------------------------
     public static class List extends ArrayList<Square> {
