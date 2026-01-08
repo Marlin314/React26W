@@ -1,11 +1,12 @@
 package sandbox;
 import react.graphics.*;
 
+import javax.swing.*;
 import java.awt.*;
-import java.awt.event.MouseEvent;
+import java.awt.event.*;
 import java.util.ArrayList;
 
-public class Squares extends WinApp{
+public class Squares extends WinApp implements ActionListener{
   public static G.VS theVS = new G.VS(100,100,200,300);
   public static Color color = G.rndColor();
   public static Square.List squares = new Square.List();
@@ -14,7 +15,15 @@ public class Squares extends WinApp{
   private static G.V mouseDelta = new G.V(0,0); // mouse Pressed overwrites this
   public static boolean showSpline = false;
 
-  public Squares(){super("Squares",1000,800);}
+  public static Timer timer;
+  public Squares(){
+    super("Squares", 1000, 800);
+    timer = new Timer(30,this);
+    timer.setInitialDelay(5000); // 5 seconds before timer starts
+    timer.start(); // start the timer
+  }
+
+  public void actionPerformed(ActionEvent ae){repaint();}
 
   @Override
   public void paintComponent(Graphics g){

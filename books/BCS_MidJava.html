@@ -1190,12 +1190,14 @@ Timers are easy. Their constructor requires two arguments. The first is a time i
 
 WHAT? What is an ActionListener? An ActionListener is anything that implements the ActionListener interface which consists of a single function void actionPerformed(ActionEvent ae). So you need to tell the Timer at the time you construct it which object is going to sit around and wait around for the actionPerformed call.
 
-Well in our case, since what we want to do is repaint the screen, it should be our Window object which is the single Squares object that we created in our main routine. This means that we need to make our Squares class into an Action Listener
+Well in our case, since what we want to do is repaint the screen, it should be our WinApp object which is the single Squares object that we created in our main routine. This means that we need to make our Squares class into an Action Listener
 
+--update signature for Squares
   public class Squares extends WinApp implements ActionListener{
   
 Then we create the actionPerformed function
 
+--add to Squares
   public void actionPerformed(ActionEvent ae){repaint();}
   
 And we will want a place that can hold the timer. We will just put the timer into a static variable in the Squares class since we will only need one Timer. Then we will modify the constructor of the Squares class to both create and initialize that timer. Oh, Important point, we are talking Swing Timers here not java.util Timer. Make sure that you import the correct class!
@@ -1204,9 +1206,11 @@ And we will want a place that can hold the timer. We will just put the timer int
   public Squares(){
     super("Squares", 1000, 800);
     timer = new Timer(30,this);
-    timer.setInitialDelay(5000); // I give myself 5 seconds before the timer starts
+    timer.setInitialDelay(5000); // 5 seconds before timer starts
     timer.start(); // start the timer
   }
+ 
+--Commit: Added Animation Timer
  
 Now you should have squares flying around on the screen. Pretty cool!
 
