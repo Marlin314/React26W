@@ -1140,10 +1140,10 @@ Check it out! Notice that just as you would expect, each time you add a new squa
 
 So our next step is to show you how to make things bounce. It is not difficult, it just means occasionally flipping the sign of a component of your velocity vector.
 
-If you notice that the loc.x for your square is now less than the minimum coordiante for your screen (which is zero) AND if your dv.x was negative, it was that negative value of your x velocity that drove you into the left wall and when you bounced, your x velocity vectory should now be positive making you increase continually increase instead of decreasing. Likewise for your Right margin and likewise for your y values.
+If you notice that the loc.x for your square is now less than the minimum coordinate for your screen (which is zero) AND if your dv.x was negative, it was that negative value of your x velocity that drove you into the left wall and when you bounced, your x velocity vector should now be positive making you increase instead of decreasing. Likewise for your Right margin and likewise for your y values.
 
---in Squares add moveAndBounce
-  public void moveAndBounce(){
+--in Square add moveAndBounce
+  public void moveAndBounce(){ // change dv if needed
     loc.add(dv);
     if(loc.x < 0 && dv.x <0){dv.x = - dv.x;}
     if(loc.x > 1000 && dv.x >0){dv.x = - dv.x;}
@@ -1156,7 +1156,9 @@ And of course, you now need to modify the draw routine so that it calls that mov
 --in Squares modify draw()
   public void draw(Graphics g){fill(g,c); moveAndBounce();} 
   
-Check it out! Notice: If you are quick, you can still resize squares that you draw - the trouble being that your drag code, that was supposed to be rubberbanding your rectangle, is calling paintComponent over and over and thus continually moving the rectangle. Also notice, in our bounce code we are testing for when the UPPER-LEFT corner hits the wall NOT when the appropriate side of the rectangle hits the wall. It is of course an easy calculation to add the size vlaue to the loc value when necessary to fix this calculation and we will do that, BUT we will fix it in the VS class rather than in this Bounce code. The reason is simple: we will be working with these VS rectangles alot and we will often want to know where several other coordinates are as well. I have found it convenient to know 6 values, the lo, mid, and hi values of both x and y. So here are the helper functions to add to G.
+--Commit: Squares move AND bounce.  
+
+Check it out! Notice: If you are quick, you can still resize squares that you draw - the trouble being that your drag code, that was supposed to be rubberbanding your rectangle, is calling paintComponent over and over and thus continually moving the rectangle. Also notice, in our bounce code we are testing for when the UPPER-LEFT corner hits the wall NOT when the appropriate side of the rectangle hits the wall. It is of course an easy calculation to add the size value to the loc value when necessary to fix this calculation and we will do that, BUT we will fix it in the VS class rather than in this Bounce code. The reason is simple: we will be working with these VS rectangles alot and we will often want to know where several other coordinates are as well. I have found it convenient to know 6 values, the lo, mid, and hi values of both x and y. So here are the helper functions to add to G.
 
   public int xL(){return loc.x;}
   public int xH(){return loc.x + size.x;}
