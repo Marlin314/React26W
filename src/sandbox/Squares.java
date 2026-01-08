@@ -14,6 +14,7 @@ public class Squares extends WinApp implements ActionListener{
   private boolean dragging = false;
   private static G.V mouseDelta = new G.V(0,0); // mouse Pressed overwrites this
   public static boolean showSpline = false;
+  public static G.V pressedLoc = new G.V(0,0); // set on mousePressed
 
   public static Timer timer;
   public Squares(){
@@ -46,8 +47,9 @@ public class Squares extends WinApp implements ActionListener{
       squares.add(lastSquare);
     } else {
       dragging = true;
+      lastSquare.dv.set(0,0);  // Stop the clicked square
+      pressedLoc.set(x,y);   // Record the mouse loc
       mouseDelta.set(lastSquare.loc.x - x, lastSquare.loc.y - y);
-      // note if I add dm to mouse I get upper left of rect
     }
     repaint();
   }
@@ -62,7 +64,15 @@ public class Squares extends WinApp implements ActionListener{
     }
     repaint();
   }
-  
+
+  @Override
+  public void mouseReleased(MouseEvent me){
+    if(dragging){
+      lastSquare.dv.set(me.getX() - pressedLoc.x, me.getY() - pressedLoc.y);
+    }
+  }
+
+
   public static void main(String[] args){PANEL=new Squares();WinApp.launch();}
 
   //-----------------Square------------------------------

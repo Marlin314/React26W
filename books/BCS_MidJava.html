@@ -1222,7 +1222,8 @@ We already have code that lets us drag a square around. On mouse pressed if we c
 
 Let us create a static variable to track where the mouse was when we clicked it to stop the square
 
-  public static G.V pressedLoc = new G.V(0,0); // we will set this when the mouse is pressed
+--add to Squares
+  public static G.V pressedLoc = new G.V(0,0); // set on mousePressed
 
 Now we can modify the dragging case of mouse pressed to record the pressedLoc and to kill the velocity.
 
@@ -1233,7 +1234,7 @@ Now we can modify the dragging case of mouse pressed to record the pressedLoc an
     mouseDelta.set(lastSquare.loc.x - x, lastSquare.loc.y - y);
   }
 
-And finally we will add a mouseReleased function that looks to see if we had stopped a box and if so, it will start it moving again by setting the velocity to be the difference between where you clicked down to stop the box and where you moved to BEFOR you released it. So if you click down on a box and flick to the right, you will be setting the box from whatever heading it used to be on to now moving to the right.
+The game will be in our last change. If you keep your mouse in one place, click and release it on a box, the box stops, but if you were chasing the box, and you moved before you released the mouse, you are changing the velocity of the box instead of stopping it.
 
   @Override
   public void mouseReleased(MouseEvent me){
@@ -1241,6 +1242,8 @@ And finally we will add a mouseReleased function that looks to see if we had sto
       lastSquare.dv.set(me.getX() - pressedLoc.x, me.getY() - pressedLoc.y);
     }
   }
+
+--Commit: Squares: the Game!
 
 Your Mission: Create some boxes and then stop them. Be careful. If you flick the mouse too hard when stopping a box you set it flying off in a different direction. If you miss the box that you were trying to stop you will have just created a new box moving is some other direction. Good Luck!
 
