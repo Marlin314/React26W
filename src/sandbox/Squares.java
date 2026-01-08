@@ -66,12 +66,12 @@ public class Squares extends WinApp{
     public void draw(Graphics g){fill(g,c); moveAndBounce();}
     public void resize(int x, int y){if(x>loc.x && y>loc.y){size.set(x - loc.x, y - loc.y);}}
     public void moveTo(int x, int y){loc.set(x,y);}
-    public void moveAndBounce(){ // change dv if needed
+    public void moveAndBounce(){
       loc.add(dv);
-      if(loc.x < 0 && dv.x <0){dv.x = - dv.x;}
-      if(loc.x > 1000 && dv.x >0){dv.x = - dv.x;}
-      if(loc.y < 0 && dv.y <0){dv.y = - dv.y;}
-      if(loc.y > 800 && dv.y >0){dv.y = - dv.y;}
+      if(xL() < 0 && dv.x <0){dv.x = - dv.x;}
+      if(xH() > 1000 && dv.x >0){dv.x = - dv.x;}
+      if(yL() < 0 && dv.y <0){dv.y = - dv.y;}
+      if(yH() > 800 && dv.y >0){dv.y = - dv.y;}
     }
     
     //------------------List----------------------------

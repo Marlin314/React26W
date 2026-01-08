@@ -1160,6 +1160,7 @@ And of course, you now need to modify the draw routine so that it calls that mov
 
 Check it out! Notice: If you are quick, you can still resize squares that you draw - the trouble being that your drag code, that was supposed to be rubberbanding your rectangle, is calling paintComponent over and over and thus continually moving the rectangle. Also notice, in our bounce code we are testing for when the UPPER-LEFT corner hits the wall NOT when the appropriate side of the rectangle hits the wall. It is of course an easy calculation to add the size value to the loc value when necessary to fix this calculation and we will do that, BUT we will fix it in the VS class rather than in this Bounce code. The reason is simple: we will be working with these VS rectangles alot and we will often want to know where several other coordinates are as well. I have found it convenient to know 6 values, the lo, mid, and hi values of both x and y. So here are the helper functions to add to G.
 
+--add to G.VS
   public int xL(){return loc.x;}
   public int xH(){return loc.x + size.x;}
   public int xM(){return (loc.x + loc.x + size.x)/2;}
@@ -1175,8 +1176,10 @@ And with those installed we can fix moveAndBounce:
     if(xL() < 0 && dv.x <0){dv.x = - dv.x;}
     if(xH() > 1000 && dv.x >0){dv.x = - dv.x;}
     if(yL() < 0 && dv.y <0){dv.y = - dv.y;}
-    if(yH() > 700 && dv.y >0){dv.y = - dv.y;}
+    if(yH() > 800 && dv.y >0){dv.y = - dv.y;}
   }
+  
+--Commit: Helpers added to VS
   
 Check it out! If you quickly drag out a BIG box, you should be able to see that it is now bouncing its right hand side off the right hand wall and it bottom side off the bottom of the window.
 
