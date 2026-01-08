@@ -12,6 +12,7 @@ public class Squares extends WinApp{
   public static Square lastSquare;
   private boolean dragging = false;
   private static G.V mouseDelta = new G.V(0,0); // mouse Pressed overwrites this
+  public static boolean showSpline = false;
 
   public Squares(){super("Squares",1000,800);}
 
@@ -19,6 +20,11 @@ public class Squares extends WinApp{
   public void paintComponent(Graphics g){
     G.clearBack(g);
     squares.draw(g);
+    if(showSpline && squares.size() >2){
+      g.setColor(Color.BLACK);
+      G.V  a=squares.get(0).loc, b=squares.get(1).loc, c=squares.get(2).loc; // unpack coords
+      G.spline(g,a.x, a.y, b.x, b.y, c.x, c.y, 4);
+    }
   }
 
   @Override
@@ -53,8 +59,11 @@ public class Squares extends WinApp{
   //-----------------Square------------------------------
   public static class Square extends G.VS{
     public Color c = G.rndColor();
+    public G.V dv = new G.V(G.rnd(20)-10, G.rnd(20)-10); // random velocity (-10,10)
+
     public Square(int x, int y){super(x,y,100,100);}
-    public void draw(Graphics g){fill(g,c);}
+
+    public void draw(Graphics g){fill(g,c); loc.add(dv);}
     public void resize(int x, int y){if(x>loc.x && y>loc.y){size.set(x - loc.x, y - loc.y);}}
     public void moveTo(int x, int y){loc.set(x,y);}
     

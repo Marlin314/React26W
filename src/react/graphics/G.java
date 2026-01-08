@@ -30,4 +30,14 @@ public class G{
   public static class BBox{}
   //-----------------------PL-----------------------
   public static class PL{}
+
+  // parabolic spline
+  public static void spline(Graphics g, int ax, int ay, int bx, int by, int cx, int cy, int n){
+    if(n==0){g.drawLine(ax, ay, cx, cy); return;}
+    int abx = (ax + bx)/2, aby =(ay + by)/2;
+    int bcx = (bx + cx)/2, bcy =(by + cy)/2;
+    int abcx = (abx + bcx)/2, abcy =(aby + bcy)/2;
+    spline(g,ax,ay,abx,aby,abcx,abcy,n-1);
+    spline(g,abcx,abcy,bcx,bcy,cx,cy,n-1);
+  }
 }

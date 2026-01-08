@@ -1109,14 +1109,15 @@ Remember to turn OFF the drawing of splines when you are done playing for the ne
 
 I will NOT be doing much of anything with animation in this course. However there are always people that primarily want to write video games and it seems wrong to be RIGHT at the place where I can show them how to do it and then NOT SHOW THEM! So this section like the one on splines is essentially a sidebar - I will show you the basic extra stuff for doing some animation and then you can either entirly forget it OR you can finally start your life's work as a computer animator.
 
-Since animation is NOTHING other than showing one picture after another so rapidly that the eye blends them toghther and thinks that it is seeing continuous motion all you need to do is draw a picture, show it to the screen, then draw another slightly different picture and show it and then draw another ...
+Since animation is NOTHING other than showing one picture after another so rapidly that the eye blends them together and thinks that it is seeing continuous motion all you need to do is draw a picture, show it to the screen, then draw another slightly different picture and show it and then draw another ...
 
-This infinite loop, is the animation loop. You need code that will calculate what the next frame will look like, i.e. claculate all the slightly new positions that things will be located at as they move from frame to frame AND you will need a Timer that will call your function to do those updates and to repaint your screen.
+This infinite loop, is the animation loop. You need code that will calculate what the next frame will look like, i.e. calculate all the slightly new positions that things will be located at as they move from frame to frame AND you will need a Timer that will call your function to do those updates and to repaint your screen.
 
 I am going to come at this animation in a couple of steps. First I am going to add a random velocity vector to each square. 
 
 Basically to move a point at a constant velocity from one frame to the next you create a "velocity vector", dv, which is the distance in x and y that the point moves from one frame to the next. So if your velocity vector is (2,3) and You started a point at 100,100 then at the next frame it moves to 102,103 and at the next frame it moves to 104,106 then 106,109 and so on. This means that we will need to ADD velocity vectors to location vectors - so be sure that you included this function to the G.V class so that we can do vector addition:
 
+--should already be in G.V
   public void add(V v){x += v.x; y += v.y;} 
 
 Rather than have a split between the code that UPDATES the position of all elements from the code that DRAWS all the elements. I will just do the update as a SIDE EFFECT of drawing a Square. Thus paintComponent which DRAWS the full list of square, both DRAWS them AND MOVES them.
@@ -1125,20 +1126,16 @@ We will skip the timer for just a moment because we already know a simple way th
 
 So modify the Square class to add an additional field right after its color.
 
-  public G.V dv = new G.V(G.rnd(20)-10, G.rnd(20)-10); // random velocity between -10 and 10 in both x and y
+--add member dv to Square
+  public G.V dv = new G.V(G.rnd(20)-10, G.rnd(20)-10); // random velocity (-10,10)
   
-And modify the draw routine so that it both draws the square and moves the location. I put this line into the Squares class so that a square could draw itself
+And modify the draw routine so that it both draws the square AND moves the location.
 
--- add to Square
+-- modify in Square
   public void draw(Graphics g){fill(g,c); loc.add(dv);}
   
-and then updated the draw routine in the List class to call Square draw:
+--Commit: Squares now move!
 
--- add to List
-  public void draw(Graphics g){for(Square s : this){s.draw(g);}}
-
-Stylistically, I should have done this earlier, when I first put a draw routine into list. Squares DO have an onscreen look, you SHOULD have a draw rouine in the Square class so that a square could draw itself. And the list class should have asked the square to draw itself instead of invoking a function down in the VS class.
-  
 Check it out! Notice that just as you would expect, each time you add a new square all the previous ones move, because you are forcing a repaint. Also notice that since we never limited the locations of the squares they will all eventually fly off screen never to be seen again (well actually, due to the limits of your integer size eventually the coordinates will wrap from positive 2 billion to negative 2 billion and will POSSIBLY eventually get back into the range where they would show up briefly on your screen.)
 
 So our next step is to show you how to make things bounce. It is not difficult, it just means occasionally flipping the sign of a component of your velocity vector.
