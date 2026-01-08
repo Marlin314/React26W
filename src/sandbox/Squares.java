@@ -10,6 +10,8 @@ public class Squares extends WinApp{
   public static Color color = G.rndColor();
   public static Square.List squares = new Square.List();
   public static Square lastSquare;
+  private boolean dragging = false;
+  private static G.V mouseDelta = new G.V(0,0); // mouse Pressed overwrites this
 
   public Squares(){super("Squares",1000,800);}
 
@@ -21,14 +23,28 @@ public class Squares extends WinApp{
 
   @Override
   public void mousePressed(MouseEvent me){
-    lastSquare = new Square(me.getX(), me.getY());
-    squares.add(lastSquare);
+    int x = me.getX(), y = me.getY();
+    lastSquare = squares.hit(x,y);
+    if(lastSquare == null){
+      dragging = false;
+      lastSquare = new Square(x,y);
+      squares.add(lastSquare);
+    } else {
+      dragging = true;
+      mouseDelta.set(lastSquare.loc.x - x, lastSquare.loc.y - y);
+      // note if I add dm to mouse I get upper left of rect
+    }
     repaint();
   }
-
+  
   @Override
   public void mouseDragged(MouseEvent me){
-    lastSquare.resize(me.getX(), me.getY());
+    int x = me.getX(), y = me.getY();
+    if(dragging){
+      lastSquare.moveTo(x + mouseDelta.x, y + mouseDelta.y);
+    }else{
+      lastSquare.resize(x,y);
+    }
     repaint();
   }
   
@@ -40,13 +56,17 @@ public class Squares extends WinApp{
     public Square(int x, int y){super(x,y,100,100);}
     public void draw(Graphics g){fill(g,c);}
     public void resize(int x, int y){if(x>loc.x && y>loc.y){size.set(x - loc.x, y - loc.y);}}
-
+    public void moveTo(int x, int y){loc.set(x,y);}
+    
     //------------------List----------------------------
     public static class List extends ArrayList<Square> {
       public void draw(Graphics g){for(Square s : this){s.draw(g);}}
+      public Square hit(int x, int y){
+        Square res = null;
+        for(Square s: this){if(s.hit(x,y)){res = s;}}
+        return res;
+      }
     }
   }
-
-
 }
 

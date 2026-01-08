@@ -522,10 +522,10 @@ Now where do you suppose that font is located? There must be some default font t
 That should give you a bounding box for the text string.
 
 --Commit: changed Paint to show graphics
-
+-- End Day 1
 ::S Random Color
 ==Random Colors
-
+--Day 2
 We have only used a few colors so far, static members from the color class. We want to be able to create colors in the full range so we will need the Color constructor. Furthermore, I might as well remind you how to use a random number generator.
 
 In my course I did this directly in the Paint class, but I wasn't thinking. For you folks reading the notes we will create a new class in the graphicsLib package named G. We will be needing that later so we might as well build it now and start using it.
@@ -1009,7 +1009,7 @@ Give it a try!
 --Day 3
 We want to add another feature to our squares system. Right now, no matter where you click you create a new square. We want to modify it so that if you click on white space away from any other box then you create a new square, BUT if you click on an existing box, instead of creating a new square you want to drag the square that you clicked on to someplace else.
 
-This is pretty easy to do but there is one gotcha if you are not careful. At first glance you just want to move the loc of the Square that you are dragging to the current mouse coordinate BUT the trick is this. IF you first clicked on the box somewhere far away from the upper left corner the box will seem to jump immdiately from where it was to put the upper left corner where the mouse currently is. If you want it to seem like your draging is a continuous motion - one where you grab the box some place near its center and then the mouse remains stuck to the place where you grabbed it as you move it around it - that means that you need to BIAS where you locate the box by the vector that was the displacement of your initial mouse click from the upper left. Sounds ugly in English it is easy in the code.
+This is pretty easy to do but there is one gotcha if you are not careful. At first glance you just want to move the loc of the Square that you are dragging to the current mouse coordinate BUT the trick is this. IF you first clicked on the box somewhere far away from the upper left corner the box will seem to jump immediately from where it was to put the upper left corner where the mouse currently is. If you want it to seem like your draging is a continuous motion - one where you grab the box some place near its center and then the mouse remains stuck to the place where you grabbed it as you move it around it - that means that you need to BIAS where you locate the box by the vector that was the displacement of your initial mouse click from the upper left. Sounds ugly in English it is easy in the code.
 
 Just for the record, in day 2 of the course we DID drag boxes but did NOT get this extra feature of doing it right that I just mentioned. So Day 3 of the course actually started in the middle of this section. For your reading convenience I have written this section AS IF we did this all at one time on one day.
 
@@ -1030,7 +1030,7 @@ Note: that routine will return a null if nothing was hit, and also note that it 
 Next we create a static V that will hold the mouseDelta and a static boolean to distinguish between our two behaviors, we are either dragging an existing box around OR we are rubberbanding a new box.
   
   private boolean dragging = false;
-  private static G.V mouseDelta = new G.V(0,0); // we will overwrite this coordinate in mousePressed.
+  private static G.V mouseDelta = new G.V(0,0); // mousePressed overwrites this
   
 And finally we fix up our two mouse routines so that they do the right thing:
 
@@ -1061,6 +1061,9 @@ And finally we fix up our two mouse routines so that they do the right thing:
   }
   
 Check it out!
+
+--Commit: Drag Squares
+
 ::S Sidebar: Splines
 ==Splines
 This section is a sidebar. It does not present something that we will need later in this course so you can skip this section if you wish. 
