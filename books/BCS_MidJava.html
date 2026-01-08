@@ -1262,6 +1262,7 @@ They serve two different purposes but they are based on the same basic organizat
 
 I keep all my interfaces as static nested interfaces inside a single interface named I. The outer interface I does nothing except change the names of all my nested interfaces. So if I need three interfaces, React, Hit, Draw, I will create them like this:
 
+--add to react package
   public interface I{
     public interface Draw{ public void draw(Graphics g);}
     public interface Hit{ public boolean hit(int x, int y);}
@@ -1271,7 +1272,9 @@ I keep all my interfaces as static nested interfaces inside a single interface n
     }
   } 
  
-I collect my interfaces together for 2 reasons. First, there is now only one single place where I go to look at all my interfaces. Secondly and more importantly, it gives my interfaces all a distinctive name. The interfaces like Hit and Draw that I defined above, because they are nested, actually have full names I.Hit, and I.Draw - This makes it clear that they are all interfaces and it allows me to do things like this:
+oops - I havent defined Gesture yet, comment out the React interface.
+ 
+I collect my interfaces together for 2 reasons. First, there is now only one single place where I go to look at ALL my interfaces. Secondly and more importantly as far as I am concerned, it gives my interfaces all a distinctive name. The interfaces like Hit and Draw that I defined above, because they are nested, actually have full names I.Hit, and I.Draw - This makes it clear (Hungarian convention) that they are all interfaces and it allows me to do things like this:
 
   public class Foo implements I.Foo{...}
   
@@ -1279,26 +1282,24 @@ Where I build a single class Foo that does what I want by implementing the inter
 
 I don't claim that this convention is useful for monster sized projects that may have hundreds of interfaces but I have found it useful in the past for my mid-scale projects and we will use this convention in this project - so you can go build I.java now. 
 
---create interface I in the music package
-
 ==Universal Constants
 
 In a very similar manner to the trick of collecting all my interfaces into a single file, I do the same thing with most of my static constants which are generally used to hold Magic Numbers.
 
-In most of the projects that you have built previously you have probably been taught to eliminate magic numbers by declaring them as final static values in the class that needs them. So if you have some Buffer class and you have some standard size that you use to allocate your arrays you might have:
+In most of the projects that you have built previously you have probably been taught to eliminate magic numbers by declaring them as final static values in the class that needs them. So if you have some Buffer class and you have some standard size which you use to allocate your arrays you might have:
   
   public class Buffer{
     public static final int SIZE = 1000;
     public int[] buffer = new int[SIZE];
     ...
     
-This is all well and good, but there is an organizational problem with this simple design. The problem is that some day someone from marketing will come tell you that you need to build a User Interface for a control panel so that the user can get in and change those default colors. They want the background color for the windows to be Green instead of White, and they want their buffers to be a little smaller like 500, and "we should let the user get in an customize everything! Oh and they will need meaningfull names that they can understand from their viewpoint as a user of the product not the technical name that you understand as an engineer"
+This is all well and good, but there is an organizational problem with this simple design. The problem is that some day someone from marketing will come tell you that you need to build a User Interface for a settings panel so that the user can get in and change all those those default colors. Customers might want the background color for the windows to be Green instead of White, and they want their buffers to be a little smaller like 500, and "we should let the user get in an customize everything! Oh, and they will also need meaningful names that THEY can understand from their viewpoint as a user of the product, not some technical name that YOU understand as an engineer"
 
-That is when you realize that you have hundreds of little names for magic numbers scattered across dozens of classes and it will be a royal pain to locate them all and build some system that allows you to change them all. SO our trick here is to anticipate that we will get asked to do something like this one and to collect all our magic numbers into one single place.
+That is when you realize that you now have hundreds of little names for magic numbers scattered across dozens of classes and it will be a royal pain to track them all down and build some system that allows you to change them all. SO our trick here is to anticipate that we will get asked to do something like this, and we collect all our magic numbers into one single place.
 
 I generally name that class that will hold all of my magic numbers, UC, which stands for UniversalConstants. And because it is a stand alone class I get to use double name if I want. Here is what I mean:
 
-In the class UC I typically define things using rather long names - those are the user friendly name, the names that work from a GLOBAL perspective. This is useful for maintainence and it deals with the fact that when I collect all the names acrosss the entire project into one single UC file I have a big name space where I MUST think of global meanings. Then in my individual classes like Buffer, I can essentially use a smaller more suscinct engineering name if I want to.
+In the class UC I typically define things using rather long names - those are the user friendly name, the names that work from a GLOBAL perspective. This is useful for maintenance and it deals with the fact that when I collect all the names acrosss the entire project into one single UC file, I have a big name space where I MUST think of global meanings. However in my individual classes like Buffer, I can essentially use a smaller more succinct engineering name if I want to.
 
 So I may have this in UC
 
@@ -1313,17 +1314,22 @@ Then over in my classes I can do things like this:
   public static final int MAX = UC.defaultBufferSize; // <-- inside this class I can use the name MAX
   public int[] buffer = new int[MAX]; 
   static{for(int i = 0; i<MAX; i++){buffer[i] = UC.bufferInitializationValue;}}
+  
   // in my MainWindow class
-  public static final Color BG = UC.mainWindowBackgroundColor;
+  public static final Color BK = UC.mainWindowBackgroundColor;
   // in my dialog class
-  public static final Color BG = UC.dialogBackgroundColor;
+  public static final Color BK = UC.dialogBackgroundColor;
+  
   // and of course, if you DON'T want a different short name in your class you can always use UC directly
-  g.setColor(UC.dialogBackgroundColor); //<-- the UC class just gives you the OPTION to rename.
+  g.setColor(UC.dialogBackgroundColor); 
+  
+the UC class just gives you the OPTION to rename.
   
 This design allow me to 1) collect my magic numbers into one place, 2) modify any of them in that one place. 3) think of my names GLOBALLY in a way that makes sense for the entire project when I define them in UC and yet 4) have names that make sense locally within the scope of a class. 
 
-There is of coure NO NEED to do ANY this, I have just found it a usful notion for the projects that I tend to build. This is the reaon that I have NOT cleaned up my magic numbers so far. I made my window 1000 by 800 because I had NOT built my UC class yet. Now that you know this trick it is time to clean that up. Put UC all the way up in the marlin package and start defining your constants there.
+There is of course NO NEED to do ANY this, I have just found it a useful notion for the projects that I tend to build. This is the reason that I have NOT cleaned up my magic numbers so far. I made my window 1000 by 800 because I had NOT yet built my UC class. Now that you know this trick it is time to clean that up. 
 
+-- add to react packsge
   public class UC{
     // -- ints --
     public static final int mainWindowWidth = 1000;
@@ -1335,9 +1341,9 @@ There is of coure NO NEED to do ANY this, I have just found it a usful notion fo
 
 For this next section we are going to do a bit of refactoring that will be more useful later on when we get to gesture recognition than it will be right now, but I can already see the need for it in the Squares application.
 
-I hope you noticed the difference between our mouse pressed and dragged routines when we were doing Paint versus doing Squares. In Paint, we did ONE SINGLE THING on mouse down, we drew a new line. As a result both the pressed code and the dragged code were very simple, a line or two to add a point to a growing line. However in Squares, we had to detect whether we had clicked on an existing square or on white space and had TWO completely different behaviors depending on whether we were dragging an existing square or creating a new one. We had to set a boolean, dragging, in pressed, test it in mouseDragged and suddenly our code ballooned up to half a dozen lines of code.
+I hope you noticed the difference between our mouse pressed and dragged routines when we were doing Paint versus doing Squares. In Paint, we did ONE SINGLE THING on mouse down, we drew a new line. As a result both the pressed code and the dragged code were very simple, just a line or two to add a point to a growing line. However in Squares, we had to detect whether we had clicked on an existing square or on white space and had TWO completely different behaviors (stuck into two different branches of an if) depending on whether we were dragging an existing square or were creating a new one. We had to set a boolean, dragging, in pressed, then test it in mouseDragged and suddenly our code ballooned up to half a dozen lines of code.
 
-This is not a big problem, YET, but imagine if you wanted to have an app where instead of just two behaviors you needed to do three or five. The code would quickly become unmanagable. When we get to our gesture based music notation editor we will probably have at least 3 different behaviors: 
+This is not a big problem, YET, but imagine if you wanted to have an app where instead of just two behaviors you needed to do three or five. The code in mouse pressed or dragged would quickly become unmanageable. When we get to our gesture based music notation editor we will probably have at least 3 different behaviors: 
 
 1) we will want to do gestures. These should leave ink on the screen while we are dragging, but as soon as you let up, that gesture gets recognized,and the trace on the screen is removed - it was just there so the user could see the gesture while they were making it. 
 
@@ -1345,13 +1351,12 @@ This is not a big problem, YET, but imagine if you wanted to have an app where i
 
 3) there will be times when we want to drag a handle to adjust some parameter, like resizing something. In those cases we do NOT want to have ink showing up on the screen as we drag some handle back and forth. 
 
-4) We will probably want to have buttons that you can click on to fire up an activity that also should NOT be leaving ink on the screen as you drag them (and buttons probably shouldn't drag either - typical button activity on a drag is to NOT fire the button on mousePress but on mouseRelease. This allows you to click down on a button, and while still holding it down drag it off so you can realase while not on the button if you change your mind. Buttons typically only fire if you both went down on the button and released on the button.
+4) We will probably want to have buttons that you can click on to fire up an activity that also should NOT be leaving ink on the screen as you drag them (and buttons probably shouldn't drag either - typical button activity on a drag is to NOT fire the button on mousePress but on mouseRelease. This allows you to click down on a button, and while still holding it down drag it off so you can release while not on the button if you change your mind. Buttons typically only fire if you both went down on the button and released on the button.
 
-For our improved design we will use the following model. The screen will be covered with rectangular Areas. On the first mouse down, we will run that list of areas, find out which one was hit and make that one our current area. That Area will then hold the behavior of how to interact for the initial mousePressed, for all the dragged events and for the final release. So an Area will be something that implements this interface:
+For our improved design we will use the following model. The screen will be covered with rectangular Areas (which you don't necessarily see). On the first mouse down, we will run that list of areas, find out which one was hit and make that one our current area. That Area will then hold the behavior of how to interact for the initial mousePressed, for all the dragged events and for the final release. So an Area will be something that implements this interface:
  
 --add to I
-  public interface Area{
-    public boolean hit(int x, int y);
+  public interface Area extends I.Hit{
     public void dn(int x, int y);
     public void drag(int x, int y);
     public void up(int x, int y);
@@ -1402,17 +1407,19 @@ Now that Squares are Areas, we can simplify our mousePressed() and mouseDragged 
     repaint(); // notice: I repaint here in Squares NOT in each little Area  
   }
 
-Next, we want to fix the List class so that it starts out with a special single special square named BACKGROUND. Let us first build that special square in the square class:
+Technically we no longer need mouseReleased and also don't need the boolean dragging, so comment out those as well.  
+  
+Next, we want to fix the List class so that it starts out with a single special square named BACKGROUND as the first element. Let us first build that special square in the square class:
 
 --in Square add
-  public static Square BACKGROUND = new Square(){
+  public static Square BACKGROUND = new Square(){ // note: special constructor
     public void dn(){}
     public void drag(){}
     public void up(){}
   };
   
   private Square(){ // special constructor for BACKGROUND
-    super(0,0,3000,3000); c = Color.WHITE;
+    super(0,0,3000,3000); c = Color.WHITE; // Big and White
   }
 
 I have also not yet filled in the dn, drag, and up routines for our special BACKGROUND square. I will do that in a moment. 
@@ -1426,15 +1433,15 @@ I want you to first see what an anonymous class is.
 
 ==Anonymous Class
 
-Normally, I create a class Square by calling new on a constructor. However since the background does NOT have random color but has a specific color, WHITE, a special location, (0,0) and special size, (3000,3000), I built a second constructor that I can use only to create a background square. 
+Normally, I create a class Square by calling new on a constructor. However since the background does NOT have random color but has a specific color, WHITE, a special location, (0,0) and a special size, (3000,3000), I built a second constructor that I can use only to create a background square. 
 
-Java allows you to have several functions, including constructors, which all have the same name as long as the parameter types in those copies are different. The original constructor took two ints, this one has none so they are different. That is how java knows which one you want. new Square(3,4) calls our first constructor because it has two ints. new Square() calls the second one because it has NO ints. (and new Square("Hello") is an error because java needs to fins a constructor that wants a single String parameter and you haven't yet built one of those!)
+Java allows you to have several functions, including constructors, which all have the same NAME as long as the parameter types in those copies are different. The original constructor took two ints, this one has none so they are different. That is how java knows which one you want. new Square(3,4) calls our first constructor because it has two ints. new Square() calls the second one because it has NO ints. (and new Square("Hello") is an error because java needs to fins a constructor that wants a single String parameter and you haven't yet built one of those!)
 
 In that line where we called that special constructor, we did NOT immediately end the line with a semi-colon right after the function call. Instead we put in a block with braces. That is the anonymous class part. 
 
-Normally when construcing an object you would just call "new Square();"" - with semi-colon immediately follows the constructor call. When you do that, you just get a new Sqwuare that works like any other Square. 
+Normally when construcing an object you would just call "new Square();"" - with semi-colon immediately follows the constructor call. When you do that, you just get a new Square that works like any other Square. 
 
-HOWEVER, if immediately after the constructor call you put in some braces - you can override any of the normal Square functions with special ones just for this object. This is an anonymous class. You are basically saying, "hey, I need a class that extends my old class Square and it overrides these function - but I don't need to give that class a name because I am only using it once, right here for this one single object, a class with no name - it is just an object, a single Square with these special functions."
+HOWEVER, if immediately after the constructor call you put in some braces - you can override any of the normal Square functions with special ones just for this one object. This is an anonymous class. You are basically saying, "hey, I need a class that extends my old class Square and it overrides these function - but I don't need to give that class a name because I am only using it once, right here for this one single object, a class with no name - it is just an object, a single Square with these special functions."
 
 So most Squares will use the dn, up, and drag that you define in the Square class but this one single BACKGROUND square uses the functions that are defined in the block right after you created that background square.
 
@@ -1454,6 +1461,8 @@ Note: we do not need to implement up() for the background square. We don't do an
   public void up(int x, int y){}
   
 With these changes in place, Squares looks exactly like it did before we added the animation. You can rubberband new squares and you can drag old squares. 
+
+--Commit: Paint old behavior using I.Area
 
 Conclusions: 
 

@@ -1,4 +1,5 @@
 package sandbox;
+import react.I;
 import react.graphics.*;
 
 import javax.swing.*;
@@ -11,7 +12,7 @@ public class Squares extends WinApp implements ActionListener{
   public static Color color = G.rndColor();
   public static Square.List squares = new Square.List();
   public static Square lastSquare;
-  private boolean dragging = false;
+  //private boolean dragging = false;
   private static G.V mouseDelta = new G.V(0,0); // mouse Pressed overwrites this
   public static boolean showSpline = false;
   public static G.V pressedLoc = new G.V(0,0); // set on mousePressed
@@ -37,6 +38,7 @@ public class Squares extends WinApp implements ActionListener{
     }
   }
 
+  /* pre Area code
   @Override
   public void mousePressed(MouseEvent me){
     int x = me.getX(), y = me.getY();
@@ -64,23 +66,52 @@ public class Squares extends WinApp implements ActionListener{
     }
     repaint();
   }
+  */
 
+  // post Area pressed and released
+  public static I.Area curArea; // set by mousePressed()
+  @Override
+  public void mousePressed(MouseEvent me){
+    int x = me.getX(); int y = me.getY();
+    curArea = squares.hit(x,y); // should always succeed because of BACKGROUND
+    curArea.dn(x,y);
+    repaint();
+  }
+  @Override
+  public void mouseDragged(MouseEvent me){
+    curArea.drag(me.getX(), me.getY());
+    repaint(); // notice: I repaint here in Squares NOT in each little Area  
+  }
+
+  /*
   @Override
   public void mouseReleased(MouseEvent me){
     if(dragging){
       lastSquare.dv.set(me.getX() - pressedLoc.x, me.getY() - pressedLoc.y);
     }
   }
-
+*/
 
   public static void main(String[] args){PANEL=new Squares();WinApp.launch();}
 
   //-----------------Square------------------------------
-  public static class Square extends G.VS{
-    public Color c = G.rndColor();
-    public G.V dv = new G.V(G.rnd(20)-10, G.rnd(20)-10); // random velocity (-10,10)
+  public static class Square extends G.VS implements I.Area{
+    public static Square BACKGROUND = new Square(){ // note: special constructor
+      public void dn(int x, int y){
+        lastSquare = new Square(x,y); 
+        squares.add(lastSquare);
+      }
+      public void drag(int x, int y){lastSquare.resize(x,y);}
+    };
 
+    public Color c = G.rndColor();
+    //public G.V dv = new G.V(G.rnd(20)-10, G.rnd(20)-10);
+    public G.V dv = new G.V(0,0); // stop the motion!
+    
     public Square(int x, int y){super(x,y,100,100);}
+    private Square(){ // special constructor for BACKGROUND
+      super(0,0,3000,3000); c = Color.WHITE;
+    }
 
     public void draw(Graphics g){fill(g,c); moveAndBounce();}
     public void resize(int x, int y){if(x>loc.x && y>loc.y){size.set(x - loc.x, y - loc.y);}}
@@ -92,9 +123,14 @@ public class Squares extends WinApp implements ActionListener{
       if(yL() < 0 && dv.y <0){dv.y = - dv.y;}
       if(yH() > 800 && dv.y >0){dv.y = - dv.y;}
     }
+    // required by I.Area
+    public void dn(int x, int y){mouseDelta.set(loc.x - x, loc.y - y);} // calculate drag offset
+    public void drag(int x, int y){loc.set(mouseDelta.x + x, mouseDelta.y + y);}
+    public void up(int x, int y){}
     
     //------------------List----------------------------
     public static class List extends ArrayList<Square> {
+      public List(){super(); add(Square.BACKGROUND);}
       public void draw(Graphics g){for(Square s : this){s.draw(g);}}
       public Square hit(int x, int y){
         Square res = null;
