@@ -1466,51 +1466,50 @@ With these changes in place, Squares looks exactly like it did before we added t
 
 Conclusions: 
 
-One of the primary thing that you get from objects is that because objects can have different code attached to them, they can behave differently. As a result different classes of objects can often be used to REMOVE IF statements that are testing which branch of the code you are on and what behavior you need. We did that in this case by effectively creating two I.Area classes, one of them, the default one, is for dragging squares, the other one, which we only needed in one single place so we did it anonomously, is for rubberbanding. With these two classes, we were able to eliminate the conditional branching from our mousePressed and mouseDragged routines.
+One of the primary thing that you get from objects is that because objects can have different code attached to them, they can behave differently. As a result different classes of objects can often be used to REMOVE IF statements that are testing which branch of the code you are on and what behavior you need. We did that in this case by effectively creating two I.Area classes, one of them, the default one, is for dragging squares, the other one, which we only needed in one single place so we did it anonymously, is for rubberbanding. With these two classes, we were able to eliminate the conditional branching from our mousePressed and mouseDragged routines.
 
-Note: that we did NOT reduce the amount of lines of code. If anything the class is now longer than it was. It is more complex because we now have extra interfaces and extra classes BUT we have taken a long chunk of code (8 lines or more with conditional branches in our original mousePressed) and reduced it down to just a couple lines.
+Note: that we did NOT reduce the amount of lines of code. If anything the class is now longer than it was. It is more complex because we now have extra interfaces and extra classes BUT we have taken one long chunk of code (8 lines or more with conditional branches in our original mousePressed) and reduced it down to just a couple lines.
 
 The benefit is that now we can read our mousePressed routine. "Oh, just find the Area that you clicked on, make it current, call its pressed routine, and repaint." AND you can see that it will be easier to extend IF we decide that we need to add yet another mouse behavior.
 
-The two new classes that we created are each simpler than our original class because now one class (Square) contains ONLY the code for dragging and the other (our single anonymous override) had ONLY the code for rubberbanding. So we still have ALL the code that we did, but it is now wrapped up in classes instaed of being branches of an if statement. This is what you are tyring to achieve with "Separations of Concerns". Let one class do ONE thing.
+The two new classes that we created are each simpler than our original class because now one class (Square) contains ONLY the code for dragging and the other (our single anonymous override) had ONLY the code for rubberbanding. So we still have ALL the same code that we did, but it is now wrapped up into classes instead of being branches of an if statement. This is what you are tyring to achieve with "Separations of Concerns". Let one class do ONE thing.
 
-It is very hard to see all this in advance of building something. So what you try to do is to notice when you have too many IF statements branching between different behaviors and ask yourself, "Could I simplify this by having those two different behaviors in two different classes."
+It is very hard to see all this in advance of building something. So what you try to do is to notice when you have too many IF statements branching between different behaviors and ask yourself, "Could I simplify this by having those two different behaviors in two different classes." If statements, unless they are trivial should make your Spider-sense tingle.
 
 ::S Squares.java
 Because we have done a lot of changes, here is a version of Squares.java
 ==Squares.java
   package sandbox;
-  import graphics.I;
-  import graphics.WinApp;
-  import graphics.G;
+  import react.I;
+  import react.graphics.*;
   
   import javax.swing.*;
   import java.awt.*;
-  import java.awt.event.ActionEvent;
-  import java.awt.event.ActionListener;
-  import java.awt.event.MouseEvent;
+  import java.awt.event.*;
   import java.util.ArrayList;
   
   public class Squares extends WinApp implements ActionListener{
     public static G.VS theVS = new G.VS(100,100,200,300);
     public static Color color = G.rndColor();
     public static Square.List squares = new Square.List();
-    private boolean dragging = false;
-    private static G.V mouseDelta = new G.V(0,0); // set in mousePressed.
-    public static boolean showSpline = true;
+    public static Square lastSquare;
+    private static G.V mouseDelta = new G.V(0,0); // mouse Pressed overwrites this
+    public static boolean showSpline = false;
+    public static G.V pressedLoc = new G.V(0,0); // set on mousePressed
+  
     public static Timer timer;
-    public static G.V pressedLoc = new G.V(0,0);
-      
     public Squares(){
       super("Squares", 1000, 800);
       timer = new Timer(30,this);
-      timer.setInitialDelay(5000); // I give myself 5 seconds before the timer starts
+      timer.setInitialDelay(5000); // 5 seconds before timer starts
       timer.start(); // start the timer
     }
-    
+  
+    public void actionPerformed(ActionEvent ae){repaint();}
+  
     @Override
     public void paintComponent(Graphics g){
-      G.fillBack(g);
+      G.clearBack(g);
       squares.draw(g);
       if(showSpline && squares.size() >2){
         g.setColor(Color.BLACK);
@@ -1518,8 +1517,7 @@ Because we have done a lot of changes, here is a version of Squares.java
         G.spline(g,a.x, a.y, b.x, b.y, c.x, c.y, 4);
       }
     }
-    public static Square lastSquare;
-  
+    
     public static I.Area curArea; // set by mousePressed()
     @Override
     public void mousePressed(MouseEvent me){
@@ -1533,58 +1531,48 @@ Because we have done a lot of changes, here is a version of Squares.java
       curArea.drag(me.getX(), me.getY());
       repaint(); // notice: I repaint here in Squares NOT in each little Area  
     }
-    @Override
-    public void mouseReleased(MouseEvent me){
-      if(dragging){
-        lastSquare.dv.set(me.getX() - pressedLoc.x, me.getY() - pressedLoc.y);
-      }
-    }
-    @Override
-    public void actionPerformed(ActionEvent ae){repaint();}
+    
     public static void main(String[] args){PANEL=new Squares();WinApp.launch();}
   
     //-----------------Square------------------------------
     public static class Square extends G.VS implements I.Area{
-      public static Square BACKGROUND = new Square(){ // create and size square
-        public void dn(int x, int y){lastSquare = new Square(x,y); squares.add(lastSquare);}
+      public static Square BACKGROUND = new Square(){ // note: special constructor
+        public void dn(int x, int y){
+          lastSquare = new Square(x,y); 
+          squares.add(lastSquare);
+        }
         public void drag(int x, int y){lastSquare.resize(x,y);}
       };
   
       public Color c = G.rndColor();
-        // dv = random velocity between -10 and 10 in both x and y
       //public G.V dv = new G.V(G.rnd(20)-10, G.rnd(20)-10);
-      public G.V dv = new G.V(0,0);
-        
+      public G.V dv = new G.V(0,0); // stop the motion!
+    
+      public Square(int x, int y){super(x,y,100,100);}
       private Square(){ // special constructor for BACKGROUND
         super(0,0,3000,3000); c = Color.WHITE;
-      }  
-      public Square(int x, int y){super(x,y,100,100);}
-      
-      public void resize(int x, int y){
-        if(x>loc.x && y>loc.y){size.set(x - loc.x, y - loc.y);}
       }
-      public void moveTo(int x, int y){loc.set(x,y);}
+  
       public void draw(Graphics g){fill(g,c); moveAndBounce();}
+      public void resize(int x, int y){if(x>loc.x && y>loc.y){size.set(x - loc.x, y - loc.y);}}
+      public void moveTo(int x, int y){loc.set(x,y);}
       public void moveAndBounce(){
         loc.add(dv);
         if(xL() < 0 && dv.x <0){dv.x = - dv.x;}
         if(xH() > 1000 && dv.x >0){dv.x = - dv.x;}
         if(yL() < 0 && dv.y <0){dv.y = - dv.y;}
-        if(yH() > 700 && dv.y >0){dv.y = - dv.y;}
+        if(yH() > 800 && dv.y >0){dv.y = - dv.y;}
       }
-  
-      @Override  // required by I.Area
+      // required by I.Area
       public void dn(int x, int y){mouseDelta.set(loc.x - x, loc.y - y);} // calculate drag offset
       public void drag(int x, int y){loc.set(mouseDelta.x + x, mouseDelta.y + y);}
       public void up(int x, int y){}
-  
+    
       //------------------List----------------------------
-      public static class List extends ArrayList<Square>{
+      public static class List extends ArrayList<Square> {
         public List(){super(); add(Square.BACKGROUND);}
-          
         public void draw(Graphics g){for(Square s : this){s.draw(g);}}
-        public void addNew(int x, int y){add(new Square(x,y));}
-        public Square hit(int x, int y){ // can return null
+        public Square hit(int x, int y){
           Square res = null;
           for(Square s: this){if(s.hit(x,y)){res = s;}}
           return res;
@@ -1676,7 +1664,7 @@ Our reaction system will have several interfaces, and like most interfaces they 
 I commented out the React interface because it refers to a class, Stroke, that we have not defined yet. With any luck I will remember to tell you to uncomment that line when we finally need it.
   
 ==Output, 2 classes - Mass, Layer
-The output of a typical application can be quite large - think music notation; you have beams, stems, head, accidentals, clefs, staff lines, ledgers, measures, ties, slurs, mordents, guitar chords... the list goes on. But those are all application specific. The framework itself has practically nothing on the output side, just a few helper routines that will be used over and over by any particular application. I already mentioned the main one, the abstract class !bMass which holds reactions. Every one of those music things that I mentioned above probably gets its own class in a music application and since every one of those is something that you would render onto the screen and that would hang onto reactions (for example: you draw a note head on a staff and the staff had a reaction to recognize a note head and put it on the staff. The note head that you just added is a new Mass and does not yet have a stem so it has a cloud of reactions that look for stems being added to the note head). Because every music element renders and hangs onto a cloud of reactions all those music element classes will descend from Mass. And Mass is abstract because a Mass all by itself does not have any idea what it should render. The job of the Mass, the thing that it frees up every single one of those music classes from doing is the business of hanging onto a list of reactions, groveling though that list on every input to see if one of the reactions fires off, etc. Every music element should just inherit all that Reaction management code.
+The output of a typical application can be quite large - think music notation; you have beams, stems, head, accidentals, clefs, staff lines, ledgers, measures, ties, slurs, mordants, guitar chords... the list goes on. But those are all application specific. The framework itself has practically nothing on the output side, just a few helper routines that will be used over and over by any particular application. I already mentioned the main one, the abstract class !bMass which holds reactions. Every one of those music things that I mentioned above probably gets its own class in a music application and since every one of those is something that you would render onto the screen and that would hang onto reactions (for example: you draw a note head on a staff and the staff had a reaction to recognize a note head and put it on the staff. The note head that you just added is a new Mass and does not yet have a stem so it has a cloud of reactions that look for stems being added to the note head). Because every music element renders and hangs onto a cloud of reactions all those music element classes will descend from Mass. And Mass is abstract because a Mass all by itself does not have any idea what it should render. The job of the Mass, the thing that it frees up every single one of those music classes from doing is the business of hanging onto a list of reactions, groveling though that list on every input to see if one of the reactions fires off, etc. Every music element should just inherit all that Reaction management code.
 
 The one other output function that shows up in nearly every GUI application is !bLayers. IF all you are doing is presenting a single thing in black and white, layering is mostly unnecessary. As soon as you introduce color, then you need to deal with the "Painter's Algorithm" also sometimes know as "Z-Ordering" your output. All this means is that you want to paint background objects first and foreground objects later so that the foreground objects appear in front of the background objects. Clearly you can have more than just two layers (in the music app I typically used 4 or 5 - Staff lines in the deep background in grey, things on the staff like note heads in the next layer, things like ties, slurs, hairpins that look like editorial comments on top of the music in layer 3, Genuine user added mark up i.e. scribbling on top of the the page in layer 4 and finally handles and buttons i.e. all user interface controls need to appear in front of even the scribbling that the user did - it is not good to have the button that deletes the user's scribbling hidden underneath all that scribbling.)
 
@@ -1775,12 +1763,14 @@ In my music system I used N-N, the un-natural upward stroke, for this purpose an
 ::S PaintInk
 ==PaintInk
 
-We could just hack up our old Paint program thus obliterating what we have done so far in this class OR we could write it again from scratch to use more of our architectural components like I.Area and the Ink class that we are about to build. Let us be safe and move on to a new class, PaintInk. Build this class and don't forget to modify your main so that it will create a new PaintInk rather than a new Squares.
+We could just hack up our old Paint program thus obliterating what we have done so far in this class OR we could write it again from scratch to use more of our architectural components like I.Area and the Ink class that we are about to build. Let us be safe and move on to a new class, PaintInk. 
 
 PaintInk is going to be our test harness as we build several of the little G components that we need, namely BBox and PL. We will evolve the Ink class at the same time to hold those paths. 
 
+--create PaintInk in sandbox
   package sandbox;
-  import graphics.*;
+  import react.graphics.*;
+  import react.*;
   import java.awt.*;
   
   public class PaintInk extends WinApp{
@@ -1789,13 +1779,14 @@ PaintInk is going to be our test harness as we build several of the little G com
     }
     @Override
     public void paintComponent(Graphics g){
-      G.fillBackground(g, Color.WHITE);
-      g.setColor(Color.red); g.fillRect(100,100,100,100); // the graphics equivalent of "Hello World"
+      G.clearBack(g);
+      g.setColor(Color.red); g.fillRect(100,100,100,100);
     }
   
     public static void main(String[] args){PANEL=new PaintInk();WinApp.launch();}
   }
   
+-- Commit: PaintInk created.  
 Run it to verify that you are properly connected.
 
 Now build the Ink class. Put it in the reaction package. This class is a place holder for what we want to build, but eventually Ink will be a class that will keep a list of ink objects that we can show out to the screen. and we will modify our PaintInk to keep a list and show it to the screen.

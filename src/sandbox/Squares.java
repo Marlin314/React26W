@@ -12,7 +12,6 @@ public class Squares extends WinApp implements ActionListener{
   public static Color color = G.rndColor();
   public static Square.List squares = new Square.List();
   public static Square lastSquare;
-  //private boolean dragging = false;
   private static G.V mouseDelta = new G.V(0,0); // mouse Pressed overwrites this
   public static boolean showSpline = false;
   public static G.V pressedLoc = new G.V(0,0); // set on mousePressed
@@ -37,38 +36,7 @@ public class Squares extends WinApp implements ActionListener{
       G.spline(g,a.x, a.y, b.x, b.y, c.x, c.y, 4);
     }
   }
-
-  /* pre Area code
-  @Override
-  public void mousePressed(MouseEvent me){
-    int x = me.getX(), y = me.getY();
-    lastSquare = squares.hit(x,y);
-    if(lastSquare == null){
-      dragging = false;
-      lastSquare = new Square(x,y);
-      squares.add(lastSquare);
-    } else {
-      dragging = true;
-      lastSquare.dv.set(0,0);  // Stop the clicked square
-      pressedLoc.set(x,y);   // Record the mouse loc
-      mouseDelta.set(lastSquare.loc.x - x, lastSquare.loc.y - y);
-    }
-    repaint();
-  }
   
-  @Override
-  public void mouseDragged(MouseEvent me){
-    int x = me.getX(), y = me.getY();
-    if(dragging){
-      lastSquare.moveTo(x + mouseDelta.x, y + mouseDelta.y);
-    }else{
-      lastSquare.resize(x,y);
-    }
-    repaint();
-  }
-  */
-
-  // post Area pressed and released
   public static I.Area curArea; // set by mousePressed()
   @Override
   public void mousePressed(MouseEvent me){
@@ -82,16 +50,7 @@ public class Squares extends WinApp implements ActionListener{
     curArea.drag(me.getX(), me.getY());
     repaint(); // notice: I repaint here in Squares NOT in each little Area  
   }
-
-  /*
-  @Override
-  public void mouseReleased(MouseEvent me){
-    if(dragging){
-      lastSquare.dv.set(me.getX() - pressedLoc.x, me.getY() - pressedLoc.y);
-    }
-  }
-*/
-
+  
   public static void main(String[] args){PANEL=new Squares();WinApp.launch();}
 
   //-----------------Square------------------------------
