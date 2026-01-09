@@ -1646,12 +1646,12 @@ I think at this point I will just wade into vocabulary, most of which is just na
 
 ::S Vocabulary
 ==Interfaces, 4 - I.Act, I.React, I.Show, I.Area
-Our reaction system will have several interfaces, and like most interfaces they are so simple I can just show you the code. And yes, you should go ahead add this to your project.
+Our reaction system will have several interfaces, and like most interfaces they are so simple I can just show you the code. We already have most of these interfaces defined already, so no need to change your code yet.
 
 ::I java
   public interface I {
-    public interface Act{public void act();}
-    //public interface React extends Act{public int bid(Gesture g);}
+    public interface Act{public void act(Gesture g);}
+    public interface React extends Act{public int bid(Gesture g);}
     public interface Show{public void show(Graphics g);}
     public interface Area{ // we've already seen this one
       public boolean hit(int x, int y);
@@ -1660,9 +1660,7 @@ Our reaction system will have several interfaces, and like most interfaces they 
       public void up(int x, int y);
     }    
   }
-  
-I commented out the React interface because it refers to a class, Stroke, that we have not defined yet. With any luck I will remember to tell you to uncomment that line when we finally need it.
-  
+    
 ==Output, 2 classes - Mass, Layer
 The output of a typical application can be quite large - think music notation; you have beams, stems, head, accidentals, clefs, staff lines, ledgers, measures, ties, slurs, mordants, guitar chords... the list goes on. But those are all application specific. The framework itself has practically nothing on the output side, just a few helper routines that will be used over and over by any particular application. I already mentioned the main one, the abstract class !bMass which holds reactions. Every one of those music things that I mentioned above probably gets its own class in a music application and since every one of those is something that you would render onto the screen and that would hang onto reactions (for example: you draw a note head on a staff and the staff had a reaction to recognize a note head and put it on the staff. The note head that you just added is a new Mass and does not yet have a stem so it has a cloud of reactions that look for stems being added to the note head). Because every music element renders and hangs onto a cloud of reactions all those music element classes will descend from Mass. And Mass is abstract because a Mass all by itself does not have any idea what it should render. The job of the Mass, the thing that it frees up every single one of those music classes from doing is the business of hanging onto a list of reactions, groveling though that list on every input to see if one of the reactions fires off, etc. Every music element should just inherit all that Reaction management code.
 
@@ -1774,7 +1772,7 @@ PaintInk is going to be our test harness as we build several of the little G com
   import java.awt.*;
   
   public class PaintInk extends WinApp{
-    public PaintInk(){
+    public PaintInk(){ // used to test the Ink class
       super("Paint Ink", UC.mainWindowWidth, UC.mainWindowHeight);
     }
     @Override
@@ -1787,12 +1785,13 @@ PaintInk is going to be our test harness as we build several of the little G com
   }
   
 -- Commit: PaintInk created.  
+
 Run it to verify that you are properly connected.
 
 Now build the Ink class. Put it in the reaction package. This class is a place holder for what we want to build, but eventually Ink will be a class that will keep a list of ink objects that we can show out to the screen. and we will modify our PaintInk to keep a list and show it to the screen.
 
-  package reaction;
-  import graphics.*;
+  package react.reactions;
+  import react.graphics.*;
   import java.awt.*;
   import java.util.ArrayList;
     
@@ -1807,23 +1806,27 @@ Now build the Ink class. Put it in the reaction package. This class is a place h
     }
   }
  
-Next we modify PaintInk to have a staic variable that is an InkList, a static block to 
+oops - There is no I.Show in I. I gave it a bad name, Draw. draw() suggests line drawing, show() suggests any presentation: either drawRect or fillRect. Let's change that, and while we are at it, also delete the comments about the React interface. Let's not pretend we know what we want until we actually get to that point.
 
+--rename Draw to Show in I
+ 
+Next we modify PaintInk to have a static variable that is an InkList, and a static block to initialize that list with some ink, a stub at this point.
+
+--add to PaintInk
   public static Ink.List inkList = new Ink.List();
-  static {inkList.add(new Ink());} // add one single ink item so we can test showing a list
+  static {inkList.add(new Ink());} // a test stub
   
-Finally we modify paint component to show our ink list (and remove the fillRect call which is now over in PaintInk
+Finally we modify paint component to show our ink list (and remove the fillRect call which is now over in PaintInk as a stub
 
+--replace in PaintInk
    public void paintComponent(Graphics g){
-    G.fillBack(g);
+    G.clearBack(g);
     inkList.show(g);
   }
 
-We won't see anything if we run that since the inkList is empty. We can test that it works though by adding a line in the PaintTest constructor to shove one new Ink onto the inkList.
+--Commit: test conections PaintInk to Ink
 
-  inkList.add(new Ink());
-
-Test it and then remove that line.
+Test it and then delete the static block that added an initial Ink.
 
 ==Ink.Buffer
 We will want an Ink.Buffer class to hold the mouse trace as the user draws. That will be an extension of PL, which will our helper in G for polylines so we need to go build that first over in G
@@ -1843,7 +1846,7 @@ We will want an Ink.Buffer class to hold the mouse trace as the user draws. That
     public void draw(Graphics g){drawN(g, points.length);} // draws the whole array.
   }
 
-Now with that class we can build our Ink.Buffer class
+Now with that class in G we can build our Ink.Buffer class
 
   //----------------------------Ink.Buffer----------------------------
   public static class Buffer extends G.PL implements I.Show, I.Area{
@@ -1860,13 +1863,15 @@ Now with that class we can build our Ink.Buffer class
   }
 
 We will need to define inkBufferMax in UC. I think 500 should be good enough.
+
+--add to UC
   public static final int inkBufferMax = 500;  
 
 Note: we have made our buffer showable. It just draws out the n points that are in the buffer, and it was for this purpose that we put that drawN function into PL.
 
 We have also make the buffer implement I.Area. So when we want an area that collects ink, we can just ask the Ink.BUFFER to do that.
 
-We made our Buffer constructor private. This is almost always an indication that we have a singlton - and that is true. We do not want other classes createing Ink.Buffers. The Ink class will create only one of these which it will keep as a static member. And we might as well make Ink a little more like the Ink that we want - we will make it an extension of PL and we will make the ink constructor copy the points from the BUFFER:
+We made our Buffer constructor private. This is almost always an indication that we have a singleton - and that is true. We do not want other classes creating Ink.Buffers. The Ink class will create only one of these which it will keep as a static member. And we might as well make Ink a little more like the Ink that we want - we will make it an extension of PL and we will make the ink constructor copy the points from the BUFFER:
   
   public class Ink extends G.PL implements I.Show{
     public static Buffer BUFFER = new Buffer();
@@ -1880,12 +1885,13 @@ Note: We need to create a second G.V constructor that will make a new V which is
 
 --add to G.V
     public V(V v){x = v.x; y = v.y;} // copy existing V
+    
+also, create an inkColor in UC and set it to BLUE.    
 
 Lastly - We need to fix up our app, PaintInk. We want it to show not only the inkList but also the Ink.BUFFER as we draw into it. And we need to connect the mouse routines in the App to those over in the buffer.
 
-
   public void paintComponent(Graphics g){
-    G.fillBack(g);
+    G.clearBack(g);
     inkList.show(g);
     g.setColor(Color.RED); Ink.BUFFER.show(g);
   }
@@ -1901,60 +1907,66 @@ Lastly - We need to fix up our app, PaintInk. We want it to show not only the in
 Yes, that was a lot of changes But here are the two chunks
 
 ==PaintInk.java
-  public class PaintInk extends Window{
+  public class PaintInk extends WinApp{
     public static Ink.List inkList = new Ink.List();
   
     public PaintInk(){super("Paint Ink", UC.mainWindowWidth, UC.mainWindowHeight);}
     
+    @Override
     public void paintComponent(Graphics g){
-      G.fillBack(g);
+      G.clearBack(g);
       inkList.show(g);
-      g.setColor(Color.RED); Ink.BUFFER.show(g);     
+      g.setColor(Color.RED); Ink.BUFFER.show(g);
     }
-    
+  
     public void mousePressed(MouseEvent me){Ink.BUFFER.dn(me.getX(),me.getY()); repaint();}
     public void mouseDragged(MouseEvent me){Ink.BUFFER.drag(me.getX(),me.getY()); repaint();}
     public void mouseReleased(MouseEvent me){
-      Ink.BUFFER.up(me.getX(),me.getY()); 
-      inkList.add(new Ink()); 
+      Ink.BUFFER.up(me.getX(), me.getY());
+      inkList.add(new Ink());
       repaint();
     }
+  
+    public static void main(String[] args){PANEL=new PaintInk();WinApp.launch();}
   }
 
 ==Ink.java
   public class Ink extends G.PL implements I.Show{
     public static Buffer BUFFER = new Buffer();
     public Ink(){
-      super(BUFFER.n); // create PL big enough to hold the n points in BUFFER
-      for(int i = 0; i<BUFFER.n; i++){this.points[i] = new G.V(BUFFER.points[i]);}
+      super(BUFFER.n); // allocate a PL large enough to hold the n points in the buffer
+      for(int i = 0; i<BUFFER.n; i++){points[i] = new G.V(BUFFER.points[i]);}
     }
     public void show(Graphics g){g.setColor(UC.inkColor); this.draw(g);}
-    // ---- List ------
+    //----------------------------Ink.Buffer----------------------------
+    public static class Buffer extends G.PL implements I.Show, I.Area{
+      public static final int MAX = UC.inkBufferMax; // maximum size of buffer
+      public int n; // how many points are actually in the buffer.
+      private Buffer(){super(MAX);} // create the PL with MAX points
+      public void add(int x, int y){if(n<MAX){points[n].set(x,y); n++;}} // adds new point to buffer
+      public void clear(){n = 0;}
+      public void show(Graphics g){this.drawN(g, n);} // Only draw existing points
+      public boolean hit(int x, int y){return true;} // any point COULD go into ink
+      public void dn(int x, int y){clear(); add(x,y);} // add first point
+      public void drag(int x, int y){add(x,y);} // add each point as it comes in
+      public void up(int x, int y){add(x,y);}
+    }
+  
+    //---------------------------List----------------------------------
     public static class List extends ArrayList<Ink> implements I.Show{
       public void show(Graphics g){for(Ink ink : this){ink.show(g);}}
     }
-    // ---- Buffer ------
-    public static class Buffer extends G.PL implements I.Show, I.Area{
-      public static final int MAX = UC.inkBufferMax;
-      public int n = 0; // tracks how many points are in the buffer.
-      private Buffer(){super(MAX);}
-      public void add(int x, int y){if(n<MAX){points[n].set(x,y); n++;}} // adds 1 new point to buffer
-      public void clear(){n = 0;} // reset the buffer
-      public void show(Graphics g){this.drawN(g, n);}// draw the n points as a line.
-      public boolean hit(int x, int y){return true;} // any point COULD go into ink
-      public void dn(int x, int y){clear(); add(x,y);} // add first point
-      public void drag(int x, int y){add(x,y);} // add each point as it comes is
-      public void uo(int x, int y){}
-    }
   }
+  
+--Commit: PaintInk allows you to draw Ink traces  
   
 Homework:
 
-As written, the app leaves red ink (the buffer) on the screen when you finish drawing the stroke, while all the other ink is black. What is the minimal change that will make the ink turn black when you mouse up.
+As written, the app leaves red ink (the buffer) on the screen when you finish drawing the stroke, while all the other ink is blue. What is the minimal change that will make the ink turn blue when you mouse up.
 
 Hint: don't try to change the mouse released code. Just change paint component.
 
-Draw a LONG line and see if you can max out our 300 point ink buffer. (You MUST do this to test the guard that you put into the code to prevent overwriting the buffer!)
+Draw a LONG line and see if you can max out our 500 point ink buffer. (You MUST do this to test the guard that you put into the code to prevent overwriting the buffer!)
 
 Kind of makes you wonder how many points you typically use in a single short stroke. Time to start learning how big typical short gestures are. Add some code so that PaintInk will show you the size of the last Ink stroke that you drew. Just draw a number/message somewhere up toward the upper left corner of the window.
 
