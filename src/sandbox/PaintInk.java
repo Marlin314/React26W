@@ -14,8 +14,10 @@ public class PaintInk extends WinApp{
   @Override
   public void paintComponent(Graphics g){
     G.clearBack(g);
-    inkList.show(g);
     g.setColor(Color.RED); Ink.BUFFER.show(g);
+    inkList.show(g);
+    g.drawString("points: "+Ink.BUFFER.n, 600,30);
+
   }
 
   public void mousePressed(MouseEvent me){Ink.BUFFER.dn(me.getX(),me.getY()); repaint();}

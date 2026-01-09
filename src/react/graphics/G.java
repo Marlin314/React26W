@@ -7,12 +7,13 @@ public class G{
   public static int rnd(int max){return RND.nextInt(max);}
   public static Color rndColor(){return new Color(rnd(256),rnd(256),rnd(256)); }
   public static void clearBack(Graphics g){g.setColor(Color.WHITE); g.fillRect(0,0,5000,5000);}
-
+  public static void drawCircle(Graphics g, int x, int y, int r){g.drawOval(x-r,y-r,r+r,r+r);}
   //-----------------------V------------------------
   public static class V{
     public int x,y;
     public V(int x, int y){this.set(x,y);}
-    public V(V v){x = v.x; y = v.y;} // copy existing V
+    public V(V v){this.set(v);} // copy existing V
+    public void set(V v){x = v.x; y=v.y;}
     public void set(int x, int y){this.x = x; this.y = y;}
     public void add(V v){x += v.x; y += v.y;} // vector addition
   }
@@ -32,9 +33,23 @@ public class G{
   }
   
   //-----------------------LoHi---------------------
-  public static class LoHi{}
+  public static class LoHi{ // range from lo to hi
+    public int lo, hi;
+    public LoHi(int min, int max){lo = min; hi = max;}
+    public void set(int v){lo = v; hi = v;} // first value into the set
+    public void add(int v){if(v<lo){lo=v;} if(v>hi){hi=v;}} // move bounds if necessary
+    public int size(){return (hi-lo) > 0 ? hi-lo : 1;}
+  }
   //-----------------------BBox---------------------
-  public static class BBox{}
+  public static class BBox{ // Bounding Box
+    LoHi h, v;  // horizontal and vertical ranges.
+    public BBox(){h = new LoHi(0,0); v = new LoHi(0,0);}
+    public void set(int x, int y){h.set(x); v.set(y);} // sets it to a single point
+    public void add(int x, int y){h.add(x); v.add(y);}
+    public void add(V v){add(v.x, v.y);}
+    public VS getNewVS(){return new VS(h.lo, v.lo, h.hi-h.lo, v.hi-v.lo);}
+    public void draw(Graphics g){g.drawRect(h.lo, v.lo, h.hi-h.lo, v.hi-v.lo);}
+  }
   //-----------------------PL-----------------------
   public static class PL { // Polyline
     public V[] points;  // we keep an array of points
@@ -47,6 +62,11 @@ public class G{
       for(int i = 1; i < n; i++) {
         g.drawLine(points[i - 1].x, points[i - 1].y, points[i].x, points[i].y);
       }
+      drawNDots(g, n);
+    }
+    public void drawNDots(Graphics g, int n){
+      g.setColor(Color.BLUE);
+      for(int i=0; i<n; i++){drawCircle(g, points[i].x, points[i].y, 4);}
     }
     public void draw(Graphics g){drawN(g, points.length);} // draws the whole array.
   }

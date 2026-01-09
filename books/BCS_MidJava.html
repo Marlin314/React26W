@@ -1970,7 +1970,6 @@ Draw a LONG line and see if you can max out our 500 point ink buffer. (You MUST 
 
 Kind of makes you wonder how many points you typically use in a single short stroke. Time to start learning how big typical short gestures are. Add some code so that PaintInk will show you the size of the last Ink stroke that you drew. Just draw a number/message somewhere up toward the upper left corner of the window.
 
-
 ::S Bounding Box
 ==Bounding Box
 --Day 5
@@ -1988,7 +1987,6 @@ LoHi will be the helper class to track ranges and BBox will be the two LoHi valu
     public void set(int v){lo = v; hi = v;} // first value into the set
     public void add(int v){if(v<lo){lo=v;} if(v>hi){hi=v;}} // move bounds if necessary
     public int size(){return (hi-lo) > 0 ? hi-lo : 1;}
-    public int constrain(int v){if(v<lo){return lo;} else return (v<hi)?v:hi;}
   }
   
   public static class BBox{ // Bounding Box
@@ -2001,7 +1999,7 @@ LoHi will be the helper class to track ranges and BBox will be the two LoHi valu
     public void draw(Graphics g){g.drawRect(h.lo, v.lo, h.hi-h.lo, v.hi-v.lo);}
   }
   
-Once we have those helpers written it is an easy manner to fix up our Ink.Buffer so that it has a BBox attached which it clears out on each mouse pressed, and which it updates as the mouse comes in. For the purposes of testing we will modify the Ink.Buffer show routine to draw out the Bounding box as the ink is collected. After you have seen that work you should comment it out.
+Once we have those helpers written it is an easy manner to fix up our Ink.Buffer so that it has a BBox attached which it clears out on each mouse pressed, and which it updates as the mouse events come in. For the purposes of testing we will modify the Ink.Buffer show routine to draw out the Bounding box as the ink is collected. After you have seen that work you should comment it out.
 
 --  ...Ink.Buffer..
   public int n = 0; // tracks how many points are in the buffer.
@@ -2010,31 +2008,40 @@ Once we have those helpers written it is an easy manner to fix up our Ink.Buffer
   public void show(Graphics g){this.drawN(g, n); bbox.draw(g);} // show bbox for now to test
   public void dn(int x, int y){clear(); bbox.set(x,y); add(x,y);} // first point resets bbox
   // we don't need to update dragged because add has been modified to add to the bbox as well.  
+
+--Commit: Ink.BUFFER now has BBox
+
+Test this. See it draw the bounding box, then delete the showing of the bounding box when you show the buffer.
       
 ::S Subsampling
 ==Subsampling
 
-When you draw a single stroke on the screen, like for example a character V how many points do you actually draw? You probably don't know and neither do I. Lets modify PaintInk and test it. Add this line to paintComponent:
+When you draw a single stroke on the screen, like for example a character V how many points do you actually draw? You probably don't know and neither do I. Lets modify PaintInk and test it. 
 
+--Add to paintComponent:
   g.drawString("points: "+Ink.BUFFER.n, 600,30);
 
 Now draw some lines and see what you get.
 
-On my machine. A short quick horizontal line was on the order of 15 points. A V shape, not particularly big was about 40 points. A Slowly drawn V shape that filled the screen takes nearly 400 points. When we get to the point that we want to recognize that large screen filling V as being the same shape as the little small V we will need to deal with 3 things. We don't care where on the screen we drew it, we don't care what size we drew it, and we don't care how many points we actually captured from the mouse. If the user draws slowly, they get lots of mouseMove events, if they draw rapidly the get fewer mouse move events. Basically for our recognition we want Translation, Scale and SampleSize invarience. We are going to deal with the last of those first.
+On my machine. A short quick horizontal line was on the order of 15 points. A V shape, not particularly big was about 40 points. A Slowly drawn V shape that filled the screen takes nearly 400 points. 
+ 
+When we get to the point that we want to recognize that large screen filling V as being the same shape as the little small V we will need to deal with 3 things. 1) We don't care where on the screen we drew it (we want translation invariance), 2) we don't care what size we drew it (we want scale invariance), and 3) we don't care how many points we actually captured from the mouse (we want sample size invariance). 
 
-Subsampling is the trick of taking some variable number of data points and either throwing some of them out or adding some new ones in to get the number of data points to a single exact number like 20. There are fancy ways of doing that, where you interpolate between existing points but we will do nothing fancy here. If we have too few we will replicate a few points, if we have too many we will just throw them out. 
+If the user draws slowly, they get lots of mouseMove events, if they draw rapidly the get fewer mouse move events. Basically for our recognition we want Translation, Scale and SampleSize invarience. We are going to deal with the last of those, sampleSize, first.
+
+Subsampling is the trick of taking some variable number of data points and either throwing some of them out or adding some new ones in to get the number of data points to be a single exact number like 20. There are fancy ways of doing that, where you interpolate between existing points but we will do nothing fancy here. If we have too few we will replicate a few points, if we have too many we will just throw them out. (And then technically we watch and see how well it works and decide whether this lazy/easy way of dealing with sample size is good enough for our purposes!) 
 
 Here, where we are drawing 2D graphic points on a screen over time, there are several basic ways that we COULD subsample, we could look at how far apart the datapoints are on the screen and try to pick ones that are a representative distance apart (this is called "Spatial Subsampling") OR we could just pick points that a equally spaced in time (like throwing out ever third point - called "Temporal Subsampling"). There is another method that looks for places of maximum curvature i.e. trying to find the most extreme turning points and I don't know if that method has a standard name. The purpose of these different subsampling methods is simply to preserve as much information about what matters to you as possible.
 
-The points that we collected from the mouse were already a sampling of all the points that COULD have been between the beginning and the ending of your stroke. They are NOT being sampled in time because we do NOT have a timer firing off every second giving us another mouse point. When the mouse does NOT move we get NO points. Once the mouse IS moving we are pretty much sampling in time, because it takes a certain amount of time for the system to read in one mouse value and be ready for the next one. So the mouse is closer to time sampled than it is to spatialy sampled. On the other hand, if the user is drawing slowly, time does NOT matter, every time the mouse MOVES by one pixel, that would be enough to fire a mouse event and then you ARE sampling by space rather than by time.
+The points that we collected from the mouse were already a sampling of all the points that COULD have been between the beginning and the ending of your stroke. They are NOT being sampled in time because we do NOT have a timer firing off every second giving us another mouse point. When the mouse does NOT move we get NO points. Once the mouse IS moving we are pretty much sampling in time, because it takes a certain amount of time for the system to read in one mouse value and be ready for the next one. So the mouse is closer to time sampled than it is to being spatially sampled. On the other hand, if the user is drawing slowly, time does NOT matter, every time the mouse MOVES by one pixel, that would be enough to fire a mouse event and then you ARE sampling by space rather than by time.
 
-Humm.. what is really going on with that mouse. What do those points actually look like? Time to modify PaintInk and see what is going on. (By the way, that is part of what I am actually showing in this lesson. When you want to know something about what is going on with your computer - WRITE SOME CODE AND FIND OUT! Do not just Google and read garbage!)
+Humm.. so what is really going on with that mouse. What do those points actually look like? Time to modify PaintInk and SEE what is going on. (By the way, that is part of what I am actually showing in this lesson. When you want to know something about what is going on with your computer - WRITE SOME CODE AND FIND OUT! Do not just Google and read garbage!)
 
 Modify the Ink draw routine. It was just drawing lines between the points, so we can't actually see the points. I still want to see those lines but now I want you to draw little circles on top of each point that was actually on the line. (Oops - we can't actually do that - Ink draw is just chaining down to PL and its drawing routine, so lets add another drawing routine called drawDots to G.PL)
 
 --in G.PL
     public void drawNDots(Graphics g, int n){
-      g.setColor(Color.GREEN);
+      g.setColor(Color.BLUE);
       for(int i=0; i<n; i++){g.drawOval(points[i].x-2, points[i].y-2, 4,4);}
     }
 
@@ -2043,7 +2050,7 @@ Actually I don't like that code. I am tired of drawing ovals from the upper righ
   public static void drawCircle(Graphics g, int x, int y, int r){g.drawOval(x-r,y-r,r+r,r+r);}
   
   public void drawNDots(Graphics g, int n){
-    g.setColor(Color.GREEN);
+    g.setColor(Color.BLUE);
     for(int i=0; i<n; i++){drawCircle(g, points[i].x, points[i].y, 4);}
   }
   
@@ -2057,7 +2064,7 @@ And now temporarily I will modify the drawN routine to drawNDots in addition to 
   }
 
     
-Now when you draw, if you see nothing but green dots if you are drawing slowly. If you see black lines between green circles you are seeing time sampling, because you moved quite a ways before you got another mouse event. 
+Now when you draw, if you see nothing but blue dots if you are drawing slowly. If you see the lines between the blue circles you are seeing time sampling, because you moved quite a ways before you got another mouse event. 
    
 So what sampling method are we going to use? We will use yet another method called "Linear Sampling". This the the quick and dirty method. If we have twice as many points as we need, we just throw out every other one. If we have three times as many as we need we will keep every third point. Similarly in doubling them up, we will just replicate points as often as we need to get the number that we want.
 
@@ -2065,9 +2072,9 @@ So how do you do linear sampling? It is pretty easy, particularly when you are t
 
   for(int i = 0; i<K; i++){subSample[i] = sample[i*(N-1)/(K-1)]}
   
-Why that formula? Well, first remember that the last element in the array of N is really at N-1, likewise the last one in the K array is at K-1. SO when the index i (which is marching from 0 to K-1 in the K array) finally gets all the way up to K-1 which is the last index in the sub-sample, we want to be using the last index from the sample. So when i is K-1 that multiplier changes it to N-1. It is also easy to see that when i is zero, you moved from slot 0 to slot 0. And finally the magic of linear functions: a line is defined by 2 points. This formula which is a single multiplier IS a linear function, and because it matched at the first point and matched at the last point, it is THE linear function at any integer value that is correct at those two points.
+Why that formula? Well, first remember that the last element in the array of N is really at N-1, likewise the last one in the K array is at K-1. SO when the index i (which is marching from 0 to K-1 in the K array) finally gets all the way up to K-1 which is the last index in the sub-sample, we want to be using the last index from the original sample. So when i is K-1 that multiplier changes it to N-1. It is also easy to see that when i is zero, you moved from slot 0 to slot 0. And finally the magic of linear functions: a line is defined by 2 points. This formula which is a single multiplier IS indeed a linear function, and because it matched at the first point and matched at the last point, it is THE one and only linear function at any integer value which is correct at those two points.
 
-Let us write a routine (in Ink.Buffer) that will the n points in the ink buffer into a supplied PL. 
+Let us write a routine (in Ink.Buffer) that will subsample the n points in the ink buffer into a supplied PL. 
 
 --in Ink.Buffer
   public void subSample(G.PL pl){
@@ -2079,7 +2086,7 @@ Note: the above code requires yet another change to G.V - we need a set function
 
 --in G.V 
     public V(V v){this.set(v);} // copy existing V
-    public void set(V v){x = v.x; y=v.y;}; 
+    public void set(V v){x = v.x; y=v.y;} 
 
 And finally to see our subsampling in action, we will modify our Ink constructor so that instead of createing a PL that is ALL the points that were in Buffer, we will just sub-sample them.
 
@@ -2089,8 +2096,6 @@ And finally to see our subsampling in action, we will modify our Ink constructor
     BUFFER.subSample(this); 
   }
 
-You know, green is to hard to look at. I am going to change the color of the circles to BLUE in G.PL.drawNDots. (I am not using a UC color for this because the dots are just debug code. We will throw it all out once we know that our code is doing what we want.)
-
 Now this code is still drawing our BUFFER with all the dots, so when you finish your first stroke you will still see all the dots, but when you go to draw the second line you will see the first line sub-sampled.
 
 If you draw a very long complicated shape you will see that the sub-sampling is throwing out so many points that the fidelity is lost. Another example where our version of sub-sampling will be bad can be seen by doing the following. Draw a V shape, but draw the first branch down to the tip very rapidly and stop, then draw the second branch very slowly. You are creating a V shape with very few points on the first branch and lots on the second branch and our recognition code will have trouble matching a shape like that to a more standard uniformly drawn V. We will NOT worry about these problems. Most drawing is done uniformly and the compass gestures are NOT long complicated strokes. 
@@ -2099,9 +2104,12 @@ What we are trying to do here is to figure out what would be a good sample size 
 
 This is why we were printing out the number of points in our strokes and looking for the minimum. A short fast single line maybe gets away with about 10 points but if you turn a corner you will be taking 25 for sure and that is why 25 is about enough points to represent one of our simple V shapes. So we did all that work to create another value in UC.
 
+--add to UC
    public static final int normSampleSize = 25;
    
 And of course go ahead and change Ink to use that new constant. With that change, you should be able to write some single stroke letters, a,e,u,m and still be able to recognize them in spite of the sub-sampling.
+
+--Commit: Ink is subsampled to 25 points
 
 ::S Coordinate Transform
 == Translate and Scale
