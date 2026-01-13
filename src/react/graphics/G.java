@@ -11,11 +11,42 @@ public class G{
   //-----------------------V------------------------
   public static class V{
     public int x,y;
+    public static Transform T = new Transform();
+
     public V(int x, int y){this.set(x,y);}
     public V(V v){this.set(v);} // copy existing V
+    
     public void set(V v){x = v.x; y=v.y;}
     public void set(int x, int y){this.x = x; this.y = y;}
     public void add(V v){x += v.x; y += v.y;} // vector addition
+    public void setT(V v){set(v.tx(), v.ty());} // set to transformed value
+    public int tx(){return x*T.n/T.d + T.dx;}
+    public int ty(){return y*T.n/T.d + T.dy;}
+
+    //-----------------------Transform------------------------
+    public static class Transform{
+      public int dx, dy, n, d;
+
+      // helpers
+      // OldWidth, OldHeight, NewWidth, NewHeight - used to compute scale
+      private void setScale(int oW, int oH, int nW, int nH){
+        n = (nW>nH)?nW:nH;  d = (oW>oH)?oW:oH;
+      }
+      private int getOff(int oZ, int oW, int nZ, int nW){
+        return (-oZ-oW/2)*n/d + nZ + nW/2;
+      }
+
+      public void set(VS oVS, VS nVS){
+        setScale(oVS.size.x, oVS.size.y, nVS.size.x, nVS.size.y);
+        dx = getOff(oVS.loc.x, oVS.size.x, nVS.loc.x, nVS.size.x);
+        dy = getOff(oVS.loc.y, oVS.size.y, nVS.loc.y, nVS.size.y);
+      }
+      public void set(BBox from, VS to){
+        setScale(from.h.size(), from.v.size(), to.size.x, to.size.y);
+        dx = getOff(from.h.lo, from.h.size(), to.loc.x, to.size.x);
+        dy = getOff(from.v.lo, from.v.size(), to.loc.y, to.size.y);
+      }
+    }
   }
 
   //-----------------------VS-----------------------
@@ -62,13 +93,14 @@ public class G{
       for(int i = 1; i < n; i++) {
         g.drawLine(points[i - 1].x, points[i - 1].y, points[i].x, points[i].y);
       }
-      drawNDots(g, n);
+      // drawNDots(g, n); used to determine sample size
     }
     public void drawNDots(Graphics g, int n){
       g.setColor(Color.BLUE);
       for(int i=0; i<n; i++){drawCircle(g, points[i].x, points[i].y, 4);}
     }
     public void draw(Graphics g){drawN(g, points.length);} // draws the whole array.
+    public void transform(){for(V v:points){v.setT(v);}}  
   }
   
   // ------ more static functions ---------

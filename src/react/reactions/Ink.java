@@ -8,9 +8,12 @@ import java.util.ArrayList;
 public class Ink extends G.PL implements I.Show{
   public static Buffer BUFFER = new Buffer();
   public static final int K = UC.normSampleSize;
+  public static G.VS TEMP = new G.VS(100,100,100,100); // for testing, a box that we will move ink to
   public Ink(){
     super(K); // create the PL that is this Ink.
     BUFFER.subSample(this);
+    G.V.T.set(BUFFER.bbox, TEMP);
+    transform();
   }
   public void show(Graphics g){g.setColor(UC.inkColor); this.draw(g);}
   //----------------------------Ink.Buffer----------------------------

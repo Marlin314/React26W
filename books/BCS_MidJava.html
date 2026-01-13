@@ -336,9 +336,9 @@ Technically this is/was actually a bug in the original definition of the Java La
 
 In a language which is known (both revered AND hated) for being very verbose precisely to help prevent you from making mistakes; if you want a function to be abstract you must declare it abstract, if you want a function to throw exceptions you must declare that it throws exceptions, if you wanted to override a function then you must declare it to overrides... oops, wait, we forgot to put that into the language definition - 'override' should have been a keyword that comes just befor a function definition. This was an oversight!
 
-Oh damn! we have already frozen the set of keywords in the langusage. We can't just add some new word like "override" now. People might already be using that word as a variable name in their code. We could break java code that people have alreday written by adding a new keyword. What can we do? 
+Oh damn! we have already frozen the set of keywords in the language. We can't just add some new word like "override" now. People might already be using that word as a variable name in their code. We could break java code that people have already written by adding a new keyword. What can we do? 
 
-Oh wait, we have just added this ANNOTATION system where speical lines that start with an @ can tell the compiler extra crap that a debugger might need. We can just put override into the annotation system. 
+Oh wait, we have just added this ANNOTATION system where special lines that start with an @ can tell the compiler extra crap that a debugger might need. We can just put override into the annotation system. 
 
 And that is why it has an '@' in front and is why it sits on a stand-alone line rather than just being just another keyword that is part of a function signature. Oops, Sorry!
 
@@ -786,7 +786,6 @@ We add A Pic nested class, we added a Pic object, thePic, we modified mousePress
 ::C Basic Graphics
 ::S Intro
 ==Basic Graphics
---Day 2
 
 We are going to start adding helper functions to our G class. I could tell you in advance some of the functions that I have found helpful in the past, however in keeping with the notion that these are YOUR helpers I will NOT go add something to the helper class G until we actually need it. But in the interests of disclosure I will outline those things that I have found useful in the past, which we will eventually be adding to this G class.
 
@@ -2100,7 +2099,7 @@ Now this code is still drawing our BUFFER with all the dots, so when you finish 
 
 If you draw a very long complicated shape you will see that the sub-sampling is throwing out so many points that the fidelity is lost. Another example where our version of sub-sampling will be bad can be seen by doing the following. Draw a V shape, but draw the first branch down to the tip very rapidly and stop, then draw the second branch very slowly. You are creating a V shape with very few points on the first branch and lots on the second branch and our recognition code will have trouble matching a shape like that to a more standard uniformly drawn V. We will NOT worry about these problems. Most drawing is done uniformly and the compass gestures are NOT long complicated strokes. 
 
-What we are trying to do here is to figure out what would be a good sample size that will work for our recognition of compass gestures (and possibly some simple english letter shpaes like 'o' or 'a' - draw some a's and some o's and see how they look sub-sampled) I specifically wrote this code with the number 10 because in my opinion it is too small. Try a number like 25 and see the difference.
+What we are trying to do here is to figure out what would be a good sample size that will work for our recognition of compass gestures (and possibly some simple english letter shapes like 'o' or 'a' - draw some a's and some o's and see how they look sub-sampled) I specifically wrote this code with the number 10 because in my opinion it is too small. Try a number like 25 and see the difference.
 
 This is why we were printing out the number of points in our strokes and looking for the minimum. A short fast single line maybe gets away with about 10 points but if you turn a corner you will be taking 25 for sure and that is why 25 is about enough points to represent one of our simple V shapes. So we did all that work to create another value in UC.
 
@@ -2114,13 +2113,13 @@ And of course go ahead and change Ink to use that new constant. With that change
 ::S Coordinate Transform
 == Translate and Scale
 
-We need to be able to do coordinate transfomration, going both directions from screen coordinates to a normalized system and for the purposes of rendering ink back the other direction from a normalized coordinate system to screen coordinates.
+We need to be able to do coordinate transformation, going both directions from screen coordinates to a normalized system and for the purposes of rendering ink back the other direction from a normalized coordinate system to screen coordinates.
 
 So we will build a transfom system that we can think of as mapping one VS box to any other VS box. Since we are not dealing with any kinds of rotations, our transforms consist of only two Geometric operations, Translation (which is accomplished by addition of coordinates) and the other is Scaling (which is accomplished by multiplication). Now there are two very traditional ways of doing the scaling, one called "isomorphic scaling" which uses a single scale factor for BOTH x and y, and the other is call "anisomorphic scaling" which allows x to scale differently from y.
 
 Anisomorphic scaling - the one with two scale factors, will allow you to map a single rectangle to any other single rectangle. This scaling does not preserve aspect ratios. Isomorphic scaling, on the other hand, does preserve, any square will map to another square, and 1 by 2 brick will map to another one by two brick.
 
-For our purposes of recognizing strokes we will want isomorphic scaling. The reason is simple: Imagine that you draw a "/" i.e. a SW-SW stroke. You could draw it almost vertically so that its height is large and its width is small, you could draw it almost horizontally so that it has large width and small height, and you could draw it as a genuine SW-SW stroke where the width and height are almost the same. IF you did anisompophic scaling when you normalized, you would stretch the width and height by different factors to make them come out the same. In other words you would turn that nearly vertical stroke, S-S, into a  SW-SW and similarly you would turn the nearly horizontal stroke W-W into a pure SW-SW. Basically anisomorphic scaling REMOVES any differences in aspect ratio from your original drawing, and there are times when that is what you want. However in this case, our compass gestures have important aspect ratio components. SO our transform will be isomorphic which means that we need a single scale factor instead of two different scale factors.
+For our purposes of recognizing strokes we will want isomorphic scaling. The reason is simple: Imagine that you draw a "/" i.e. a SW-SW stroke. You could draw it almost vertically so that its height is large and its width is small, you could draw it almost horizontally so that it has large width and small height, and you could draw it as a genuine SW-SW stroke where the width and height are almost the same. IF you did anisomorphic scaling when you normalized, you would stretch the width and height by different factors to make them come out the same. In other words you would turn that nearly vertical stroke, S-S, into a  SW-SW and similarly you would turn the nearly horizontal stroke W-W into a pure SW-SW. Basically anisomorphic scaling REMOVES any differences in aspect ratio from your original drawing, and there are times when that is what you want. However in this case, our compass gestures have important aspect ratio components. SO our transform will be isomorphic which means that we need a single scale factor instead of two different scale factors.
 
 Knowing that we are ready to start building our Transform class. Since the purpose of transforms is to transform vectors we will make this a nested class of V. Also, just because of the way that we will use them we will build one single static transform, T, in the V class, which you can initialize to one value (like setting it to be the single transformation that we need to convert all the points in the ink buffer into a norm, or instead setting it to the single transform that we need to go from a Norm out to some place on the screen) and then we can use that single transform over and over until we decide to change it.
 
@@ -2128,52 +2127,58 @@ Our Transform will just need 4 numbers
 --add to V
   //-----------------------Transform------------------------
   public static class Transform{
-    int dx, dy, n, d;
+    int dx, dy, n, d; // translation: (dx,dy) scale: n/d 
   }
   
 What are those fields in the transform? The single isomorphic Scale value is a fraction with a numerator, n, and a denominator, d. We then have  independent translations in the x and y direction which are the dx and dy. Here is the transform of one single old point,(x,y), converted by the transform to a new point, (x',y').
 
   (x',y') = (x*n/d + dx, y*n/d + dy)
 
-We will create one single static Transform in the V class, that we will set up once before we do a bunch of points. Most of the work that follows is what we need to do to compute the proper values of dx, dy, n and d. But first, we can write the code that will do the transforms assuming that those values are set. Here is the on static Transfrom in the V class
-
---Multiply BEFORE Divide
-Side note: I am doing multiplication and division with integers and there is something that you should know about integer arithmetic on computers. Integer division truncates. So 4/5 == 0, it just rounds down. It is not the NEAREST integer result, but it is close, only off by 1. 
-
-From your math classes (where you did NOT do trunction) you have learned that if you want four fifths of seventeen, there is no difference between writing that as either 17 * 4/5 or 4/5 * 17. 
-
-On computers with truncated division there is a massive difference. The first one is 17*4 which is 68 divided by 5 which is 13 (close to 13.6 the exact answer befor truncation). The second one is 4/5 which is 0 times 17 which is zero, which is massively wrong. 
-
-When working in trucating integer math you MUST do all your multiplications (which makes numbers bigger) before you ever do you divisions (which makes things smaller AND truncates introducing error) to minimize your error. If you do divisions before your multiplications you are multiplying the error that the division introduced. So yes, when I write x*n/d in the code I mean it. I didn't want you to just copy the math and not know that the order matters!
+We will create one single static Transform in the V class, that we will set up once before we do a bunch of points. Most of the work that follows is what we need to do to compute the proper values of dx, dy, n and d. But first, we can write the code that will do the transforms assuming that those values have been.
 
 --add to V
   public static Transform T = new Transform();
-  
 
 I then want to have methods in the V class that can use that single T to set the value of some V to be the transform of some other V.
 
+--add to V
   public void setT(V v){set(v.tx(), v.ty());} // set to transformed value
   public int tx(){return x*T.n/T.d + T.dx;}
   public int ty(){return y*T.n/T.d + T.dy;}
 
 So those helpers, tx, ty, allow setT to apply the Transform T to the single point v.
 
-We will also want a function in PL to transform an entire PL.
+I should warn you about something that I did in the math of those two functions, that might not be be obvious.
 
-  public void transform(){for(int i = 0; i<points.length; i++){points[i].setT(points[i]);}}
+--Multiply BEFORE Divide
+Side note: I am doing multiplication and division with integers and there is something that you should know about integer arithmetic on computers. Integer division truncates. So 4/5 == 0, it just rounds down. It is not the NEAREST integer result, but it is close, only off by 1. 
 
-Now we need to figure out HOW to initialize a transform to do the thing that we want. We will do this by imagining that we have one box of size and location that we want to move to another box with a new size and location.
+From your math classes (where you did NOT do truncation) you have learned that if you want four fifths of seventeen, there is no difference between writing that as either 17 * 4/5 or 4/5 * 17. 
 
-Since we will set up a transform that way we make that a set function in the Transform clsss. The version we will use all the time is to convert from the oldVS that was the bounding box of the original ink into a normalized coordinate system. But, we also want to go the other way sometimes, going from normalized coordinates out to some particular box on the screen.
+On computers with truncated division there is a massive difference. The first one is 17*4 which is 68 divided by 5 which is 13 (close to 13.6 the exact answer befor truncation). The second one is 4/5 which is 0 times 17 which is zero, which is massively wrong. 
+
+When working in truncating integer math you MUST do all your multiplications (which makes numbers bigger) before you ever do you divisions (which makes things smaller AND truncates introducing error) in order to minimize your error. If you do divisions before your multiplications you introduce an error and then are multiplying that error which the division introduced. So yes, when I write x*n/d in the code I mean it. I didn't want you to just copy the math and not know that the order matters!
+
+Now that we can transform a single vector we will want to use that to write a function in PL that will transform an entire PL.
+
+--add to PL
+  public void transform(){for(V v:points){v.setT(v);}}
+
+Those functions perform a Transform and now we need to figure out HOW to initialize a transform to do the thing that we want. We will do this by imagining that we have one box of size and location that we want to move to another box with a new size and location.
+
+Since we will set up a transform that way we make that a set function in the Transform class. The version we will use all the time is to convert from the oldVS that was the bounding box of the original ink into a normalized coordinate system. But, we also want to go the other way sometimes, going from normalized coordinates out to some particular box on the screen. Basically we want something like this:
 
   public void set(VS oVS, VS nVS){...}
 
 The first part of our calculation will be to set up the scale, i.e. the two values n and d.
 
-To scale a value that was in an old coordinate system, you divide the value by the old size (thus scaling it to one) and then multiplying it by the new size (thus scaling it from one up to the new size). Thus our new size is the numerator and the old size is the denominator.
+To scale a value that was in an old coordinate system, you divide the value by the old size (thus scaling it to one) and then multiplying it by the new size (thus scaling it from one up to the new size) and of course, we must do that in the proper order - multiply followed by divide. Thus our new size is the numerator and the old size is the denominator.
 
-In anisomorphic scaling, where you have 2 scale factors, one for horizontal and one for vertical, the numbers are simple. xScale = newWidth/oldWidth and yScale = newHeight/oldHeight. When we want just one scale factor we have options. We could pick one or the other. We could average the two of them, or we could force fits, which is what I will do here. Basically we look at the old box, and if it was not a square, we choose either the width or the height, whichever was larger. We think of that as being the SIZE of the old box. We do the same with the new box and that ratio is the single scale factor. I call it force fit, because it takes the largest value in the input box, shrinks that down to one and makes it no bigger than the largest value in the output box. Thus everything in the input box is forced to fit in the output box.
+In anisomorphic scaling, where you have 2 scale factors, one for horizontal and one for vertical, the numbers are simple. xScale = newWidth/oldWidth and yScale = newHeight/oldHeight. When we want just one scale factor we have options. We could pick one or the other. Or we could do something like this:
 
+Basically we look at the old box, and if it was not a square, we choose either the width or the height, whichever was larger. We think of that as being the SIZE of the old box. We do the same with the new box and that ratio is the single scale factor. We take the largest value in the input box, shrinks that down to one and make it no bigger than the largest value in the output box. 
+
+--add to Transform
   void setScale(int oW, int oH, int nW, int nH){
     n = (nW>nH)?nW:nH;  d = (oW>oH)?oW:oH;
   }
@@ -2182,43 +2187,45 @@ Next, to figure out the offsets, dx, and dy, we consider how we deal with just o
 
 Imagine a single line segment, starting at oX, and with width oW. We want to scale and translate it to be at nX and nW and we want the actual translation(s) to be mapping the center coordinate in the old coordinate system to the center coordinate in the new system.
 
-The normal way to visualize performing this operation is to do it in 3 steps. first translate the original coordinates to the origin, then scale, then tranlate the origin up to the new coordinates.
+The normal way to visualize performing this operation is to do it in 3 steps. first translate the original coordinates to the origin, then scale, then translate the origin up to the new coordinates.
 
-  x' = (x -oX)*n/d + nX 
+  x' = (x -oX -oW/2)*n/d + nX + nW/2  
   
-So in that expression we first subtract oX to translate upperleft coordinate to the origin. Then we scaled about the origin, fianlly we translate to the location of the new coordinate syste by adding nX.
+So in that expression we first subtract oX+oW/2 which is the center of the segment to translate the center to the origin. Then we scaled about the origin, then we translate to the new center nX+nW/2.
   
 As you can see, this expression is not in our ideal form of a single multiply followed by a single addition. However, now we can use algebra to simplify that above expression into one that has a single multiply followed a single final constant to add:
 
-  x' = x*n/d + (-oX*n/d + nX)
+  x' = x*n/d + ((-oX-oW/2)*n/d + nX + nW/2)
   
 So that single constant expression at the back is the single dx translation value that we needed in our transform. Because the y expression looks exactly the same, except using y and Height, we will build a single helper to help us calculate the offsets.
 
-  int setOff(int oX, int nX){
-    return -oX*n/d + nX;
+  private int getOff(int oZ, int oS, int nZ, int nS){
+    return (-oZ-oS/2)*n/d + nZ + nS/2;
   }
+  
+note: I renamed my parameters from X to Z, because the DAMN IDE whines out a warning when I spell it with X. It didn't like me having a parameter named X and passing a value named Y as if it understands coordinate math better than I do! And I can not figure out how to turn off the warnings like these that are just wrong.
   
 Finally, with these helpers we can flesh out the details of the set function that creates the transform that move us from an oldVS to a newVS:
 
   public void set(VS oVS, VS nVS){
     setScale(oVS.size.x, oVS.size.y, nVS.size.x, nVS.size.y);
-    dx = setOff(oVS.loc.x, nVS.loc.x);
-    dy = setOff(oVS.loc.y, nVS.loc.y);
+    dx = getOff(oVS.loc.x, oVS.size.x, nVS.loc.x, nVS.size.x);
+    dy = getOff(oVS.loc.y, oVS.size.y, nVS.loc.y, nVS.size.y);
   }
   public void set(BBox from, VS to){
     setScale(from.h.size(), from.v.size(), to.size.x, to.size.y);
-    dx = setOff(from.h.lo, from.h.size(), to.loc.x, to.size.x);
-    dy = setOff(from.v.lo, from.v.size(), to.loc.y, to.size.y);
+    dx = getOff(from.h.lo, from.h.size(), to.loc.x, to.size.x);
+    dy = getOff(from.v.lo, from.v.size(), to.loc.y, to.size.y);
   }
  
-I have included two versions of set, one that works from a BBox which we will probably need when normalizing Ink.BUFFER coordinates.
+I have included two versions of set, one that works from a VS to a VS and one that works from a BBox to a VS. We will probably need the BBox one when normalizing Ink.BUFFER coordinates.
 
 This was a long chapter because I know that some of my students have not done any math in a long time, so I took longer to explain how I think about the coordinate transform math. But of course when you boil it all down, there were really only two equations in the whole thing, the formula for doing the transform calculation (that shows up in tx, ty) and the calculation of the appropriate offset (setOff) when what you are given is one box that needs to move to another.
  
 ==Code Summary
 
 --PL gets one new function:
-  public void transform(){for(int i = 0; i<points.length; i++){points[i].setT(points[i]);}}
+  public void transform(){for(V v:points){v.setT(v);}}
 
 --V gets functions & a static class Transform:
   public static Transform T = new Transform();
@@ -2226,27 +2233,31 @@ This was a long chapter because I know that some of my students have not done an
   int tx(){return x*T.n/T.d + T.dx;}
   int ty(){return y*T.n/T.d + T.dy;}
     
+  //-----------------------Transform------------------------
   public static class Transform{
-    private int dx=0, dy=0, d=1, n=1; 
-    public Transform(){}
+    public int dx, dy, n, d;
   
+    // helpers
+    // OldWidth, OldHeight, NewWidth, NewHeight - used to compute scale
     private void setScale(int oW, int oH, int nW, int nH){
-      d = (oW>oH)?oW:oH; n = (nW>nH)?nW:nH;
+      n = (nW>nH)?nW:nH;  d = (oW>oH)?oW:oH;
     }
-    private int setOff(int oX, int oW, int nX, int nW){return (-oX-oW/2)*n/d + nX + nW/2;}
+    private int getOff(int oZ, int oW, int nZ, int nW){
+      return (-oZ-oW/2)*n/d + nZ + nW/2;
+    }
   
     public void set(VS oVS, VS nVS){
       setScale(oVS.size.x, oVS.size.y, nVS.size.x, nVS.size.y);
-      dx = setOff(oVS.loc.x, oVS.size.x, nVS.loc.x, nVS.size.x);
-      dy = setOff(oVS.loc.y, oVS.size.y, nVS.loc.y, nVS.size.y);
+      dx = getOff(oVS.loc.x, oVS.size.x, nVS.loc.x, nVS.size.x);
+      dy = getOff(oVS.loc.y, oVS.size.y, nVS.loc.y, nVS.size.y);
     }
     public void set(BBox from, VS to){
       setScale(from.h.size(), from.v.size(), to.size.x, to.size.y);
-      dx = setOff(from.h.lo, from.h.size(), to.loc.x, to.size.x);
-      dy = setOff(from.v.lo, from.v.size(), to.loc.y, to.size.y);
+      dx = getOff(from.h.lo, from.h.size(), to.loc.x, to.size.x);
+      dy = getOff(from.v.lo, from.v.size(), to.loc.y, to.size.y);
     }
-  }  
-  
+  }
+    
 ==Test it
 
 Now, in order to test this, we will just temporarily modify our Ink constructor to transform and move the ink from where it actually happened on the screen to some other box.
@@ -2259,11 +2270,12 @@ Now, in order to test this, we will just temporarily modify our Ink constructor 
     transform();
   }
 
+--Commit: Test Transforms from BBox to TempVS
 Try it out. Seems to work.
 
 ==Clean up
 
-Technically, we have tested the code that went from a bounding box to our VS TEMP. We will next verify that we can in fact go the other direction (and simultaneously verify that our code to construct a VS from BBox works as well) by doing this in our ink constructor. We will leave the code that we have in place, which is converting from the BBox to some standardized coordinates (100,100,100,100) and then we will just compute the Transform that move it from the TEMP coordiante system back out to the VS that corresponds to the BBox that we started with. That should put the ink right back where it came from (though reduced in sample size).
+Technically, we have tested the code that went from a bounding box to our VS TEMP. We will next verify that we can in fact go the other direction (and simultaneously verify that our code to construct a VS from BBox works as well) by doing this in our ink constructor. We will leave the code that we have in place, which is converting from the BBox to some standardized coordinates (100,100,100,100) and then we will just compute the Transform that move it from the TEMP coordinate system back out to the VS that corresponds to the BBox that we started with. That should put the ink right back where it came from (though reduced in sample size).
 
     G.V.T.set(BUFFER.bbox, TEMP); // just to test transforms
     transform();
