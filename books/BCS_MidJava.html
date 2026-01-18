@@ -2382,11 +2382,11 @@ But now that we have working normalized coordinates we can start in on the next 
 ::S Shape
 ==Shape
 
-A !nShape is an abstract notion, mostly a name, like 'O' or 'S-E'. There may be many different ways to draw a single sahpe. For example you could draw your 'O' clockwise from the top, or counter-clockwise from the top, or possibly from the bottom. Those ACTUAL different ways of drawing that shape will be called called !nPrototypes. So in our system a Shape will be a Prototype List that has a name. A single Prototype is basically a Norm. Here is the outline of the Shape class that you should build now.
+A !nShape is an abstract notion, mostly a name, like 'O' or 'S-E'. There may be many different ways to draw a single shape. For example you could draw your 'O' clockwise from the top, or counter-clockwise from the top, or possibly from the bottom. Those ACTUAL different ways of drawing that shape will be called called !nPrototypes. So in our system a Shape will be a Prototype List that has a name. A single Prototype is basically a Norm. Here is the outline of the Shape class that you should build now.
 
---add class Shape to reaction
+--add class Shape to reactions
 
-  package reaction; 
+  package react.reactions; 
   import java.util.ArrayList;
     
   public class Shape{
@@ -2419,7 +2419,9 @@ So we will add a blend routine into G.V to do this for a single V
 And once you can do it for a single V, you can do it for every V in the list of points in a Norm
 
 --in Ink.Norm
-  public void blend(Norm norm, int nBlend){for(int i = 0; i<N; i++){points[i].blend(norm.points[i], nBlend);}}
+  public void blend(Norm norm, int nBlend){
+    for(int i = 0; i<N; i++){this.points[i].blend(norm.points[i], nBlend);}
+  }
 
 And now that a Norm can get blended, a prototype that knows its blend count can be blended.
 
@@ -2431,7 +2433,7 @@ Now the main reason that we wanted Norms was so that we could compute the distan
 This means that we are going to want a function to find the bestMatch in a list of prototypes. And in fact we will want something just like it in the list of shapes. I wrote the function so that it returns the int distance of how close the match was and as a side effect it sets a static variable that points to the element on the list which produced that closest match.
 
 --in Shape.Prototype.List
-      public static Prototype bestMatch; // this is set as a side effect when running bestDist
+      public static Prototype bestMatch; // side effect of bestDist(); can be null
   
       public int bestDist(Ink.Norm norm){
         bestMatch = null;
@@ -2452,6 +2454,7 @@ The other function that I want to add, both so that I can see what the prototype
 
 --implement I.Show in Prototype.List
       private static int m = 10, w = 60; private static G.VS showbox = new G.VS(m,m,w,w);
+      
       public void show(Graphics g){ // draw a list of boxes across top of screen
         g.setColor(Color.ORANGE);
         for(int i = 0; i<size(); i++){
@@ -2488,9 +2491,9 @@ And finally hack up mouseReleased to populate the pList
 
 Note: when we run this, IF noMatch is too big, we will find matches where we don't want them a possibly be blending stuff together that are really different shapes. On the ohter hand if it is too low, it doesn't see similar shapes as being similar. It is better to err on the side of making it too small. It simply means that you will need to collect more sample prototypes in order to recognize things as oppose to recognizing things incorrectly. You would rather that your AI say that it doesn't know what something is rather than making wild guesses.
 
-Last but not least, just for fun AND for better data compression AND for extra smoothing, modify the Ink that you JUST threw into the inkList (it is right there in the variable ink) to share the norm with the prototype that you either just blended or just created. What I mean is to replace the norm that was in the ink object with the norm from a prototype.
+Last but not least, just for fun AND for better data compression AND for extra smoothing, modify the Ink that you JUST threw into the inkList (it is right there in the variable ink) to share the norm with the prototype that you either just blended or just created. What I mean is to replace the norm that was in the ink object with the norm from a prototype. You are basically throwing away the ink that you just drew and replacing it with a blended version.
 
-Think about what this will do. You draw your first character. It is an 'a'. You match nothing because it is the first thing you drew so you create a prototype for 'a'. Now throw out the ink's norm and replace it with the norm from the first prototype. Nothing has changed, the prototype's norm was just a copy of the inks norm. But now if you draw another 'a' and it matches, the prototype blends. BUT the first ink object shares that object SO the old ink object on the screen now updates to be the smoother version that you just blended.
+Think about how this works. You draw your first character. It is an 'a'. You match nothing because it is the first thing you drew so you create a prototype for 'a'. Now throw out the ink's norm and replace it with the norm from the first prototype. Nothing has changed, the prototype's norm was just a copy of the inks norm. But now if you draw another 'a' and it matches, the prototype blends. BUT the first ink object shares that object SO the old ink object on the screen now updates to be the smoother version that you just blended.
 
 As you keep drawing the same shape over and over, all the copies of that shape on your page keep updating.
 
@@ -2511,6 +2514,7 @@ Here is the code with that modification:
     repaint();
   }
 
+--Commit: Paint Ink blends and shares prototypes
 ::S Refactoring
 ==Refactoring & Renaming
 

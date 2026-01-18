@@ -71,5 +71,8 @@ public class Ink implements I.Show{
       }
       return res;
     }
+    public void blend(Norm norm, int nBlend){
+      for(int i = 0; i<N; i++){this.points[i].blend(norm.points[i], nBlend);}
+    }
   }
 }

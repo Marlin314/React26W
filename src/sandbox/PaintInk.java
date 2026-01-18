@@ -1,13 +1,15 @@
 package sandbox;
 import react.graphics.*;
 import react.*;
-import react.reactions.Ink;
+import react.reactions.*;
+import react.reactions.Shape;
 
 import java.awt.*;
 import java.awt.event.MouseEvent;
 
 public class PaintInk extends WinApp{
   public static Ink.List inkList = new Ink.List();
+  public static Shape.Prototype.List pList = new Shape.Prototype.List();
   
   public PaintInk(){super("Paint Ink", UC.mainWindowWidth, UC.mainWindowHeight);}
   
@@ -23,13 +25,23 @@ public class PaintInk extends WinApp{
       g.setColor(dist>UC.noMatchDist?Color.RED:Color.BLACK); // black for same red for different
       g.drawString("Dist: "+dist, 600, 60);
     }
+    pList.show(g);
   }
 
   public void mousePressed(MouseEvent me){Ink.BUFFER.dn(me.getX(),me.getY()); repaint();}
   public void mouseDragged(MouseEvent me){Ink.BUFFER.drag(me.getX(),me.getY()); repaint();}
   public void mouseReleased(MouseEvent me){
-    Ink.BUFFER.up(me.getX(), me.getY());
-    inkList.add(new Ink());
+    Ink ink = new Ink();
+    Shape.Prototype proto;
+    inkList.add(ink);
+    if(pList.bestDist(ink.norm) < UC.noMatchDist){ // we found a match so blend
+      proto = Shape.Prototype.List.bestMatch;
+      proto.blend(ink.norm);
+    }else{
+      proto = new Shape.Prototype();
+      pList.add(proto); // new Prototype
+    }
+    ink.norm = proto;
     repaint();
   }
 

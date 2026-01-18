@@ -47,6 +47,7 @@ public class G{
         dy = getOff(from.v.lo, from.v.size(), to.loc.y, to.size.y);
       }
     }
+    public void blend(V v, int k){set((k*x + v.x)/(k+1), (k*y + v.y)/(k+1));}
   }
 
   //-----------------------VS-----------------------
