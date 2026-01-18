@@ -786,7 +786,7 @@ We add A Pic nested class, we added a Pic object, thePic, we modified mousePress
 ::C Basic Graphics
 ::S Intro
 ==Basic Graphics
-
+--Day 3
 We are going to start adding helper functions to our G class. I could tell you in advance some of the functions that I have found helpful in the past, however in keeping with the notion that these are YOUR helpers I will NOT go add something to the helper class G until we actually need it. But in the interests of disclosure I will outline those things that I have found useful in the past, which we will eventually be adding to this G class.
 
 --V
@@ -874,7 +874,7 @@ We are going to write a new application called Squares and we will used that nex
 
 ::S Squares the App
 ==Squares
-
+--Testing hit Detection
 Let us create a new toy WinApp: 
 --build Squares in sandbox
   package sandbox;
@@ -885,7 +885,7 @@ Let us create a new toy WinApp:
     public static void main(String[] args){PANEL=new Squares();WinApp.launch();}
   }
   
-Create a VS and color and build a paintComponent that will clear the background and fill theVS with the color. 
+We want to test the VS code that we just wrote, in particular the fill and the hit routine, so create a VS and a color, then build a paintComponent that will clear the background and fill theVS with the color. 
 
 --add a static VS and Color
   public static G.VS theVS = new G.VS(100,100,200,300);
@@ -1005,7 +1005,7 @@ Give it a try!
 
 ::S Dragging Boxes
 ==Dragging Boxes
---Day 3
+
 We want to add another feature to our squares system. Right now, no matter where you click you create a new square. We want to modify it so that if you click on white space away from any other box then you create a new square, BUT if you click on an existing box, instead of creating a new square you want to drag the square that you clicked on to someplace else.
 
 This is pretty easy to do but there is one gotcha if you are not careful. At first glance you just want to move the loc of the Square that you are dragging to the current mouse coordinate BUT the trick is this. IF you first clicked on the box somewhere far away from the upper left corner the box will seem to jump immediately from where it was to put the upper left corner where the mouse currently is. If you want it to seem like your draging is a continuous motion - one where you grab the box some place near its center and then the mouse remains stuck to the place where you grabbed it as you move it around it - that means that you need to BIAS where you locate the box by the vector that was the displacement of your initial mouse click from the upper left. Sounds ugly in English it is easy in the code.
@@ -2271,6 +2271,9 @@ Now, in order to test this, we will just temporarily modify our Ink constructor 
   }
 
 --Commit: Test Transforms from BBox to TempVS
+
+Oh yes, one more minor change. Now that we have fixed our sample size at 25, we don't need to keep drawing circles around all the dots on our G.PL so go to the PL class and comment out the drawNDots() call in the drawN() function.
+
 Try it out. Seems to work.
 
 ==Clean up
@@ -2297,7 +2300,6 @@ We are mostly going to move everything that we were doing in our ink constructor
 We will need a coordinate size for our normalized coordinates. 1000 should give us plenty of resolution and yet still be small enough so that when we start squaring them and adding them to compute euclidean distances the distance numbers will on the order of several million which will fit easily into the billion range of a 32 bit integer. So add this to UC.
 
   public static final int normCoordMax = 1000;
-
 
 The Norm class in Ink will look like this: (And you will see that the Norm constructor is basically what we used to have for Ink.)
 
@@ -2355,22 +2357,24 @@ elements on the inkList - so add to paintComponent:
     if(inkList.size()>1){
       int last = inkList.size()-1;
       int dist = inkList.get(last).norm.dist(inkList.get(last-1).norm);
-      g.setColor(dist>500000?Color.RED:Color.BLACK); // black for same red for different
+      g.setColor(dist>500_000?Color.RED:Color.BLACK); // black for same red for different
       g.drawString("Dist: "+dist, 600, 60);
     }
 
 What we are looking for here with those distance numbers is this: Two shapes that are supposed to be the same should be close to one another. So if you draw two v's in a row the distance should be small, but if you draw a 'v' followed by an 'L' that distance should be large. I used the number 500K as a distinguishing number. I don't know if that number is even close to right.
 
-I want to eventually construct a new UC integer, namely noMatchDist. Basically if the distance between two Norms is greater than noMatchDist then there is no way that I want to consider those two shapes to be the same. So I had this code write the numbers in Black if they might possibly be considered to be the same shape, but colered red if they should NOT be considered a match.
+I want to eventually construct a new UC integer, namely noMatchDist. Basically if the distance between two Norms is greater than noMatchDist then there is no way that I want to consider those two shapes to be the same. So I had this code write the numbers in Black if they might possibly be considered to be the same shape, but colored red if they should NOT be considered a match.
 
 In fact, since I know that that is what I want to figure out, I should have added this value to UC:
 
-  public static final int noMatchDist = 500000;
+  public static final int noMatchDist = 500_000;
 
 And then had this line in the code that I slipped into paintComponent in PaintInk:
 
   g.setColor(dist>UC.noMatchDist?Color.RED:Color.BLACK); // black for same red for different
   
+--Commit: Paint Ink shows dist between last 2 Norms  
+
 What we are doing with that noMatchDist is limiting our nearest neighbor matching. Nearest neighbor takes an input point and DECLARES it to be the same type as whatever its nearest neighbor was. We are going to eliminate matches to neighbors that are farther than noMatchDist away. We would rather return NULL match than match something that is much too far away. So when we everntually tune this number, it will be to make a trade off from how often we returned a null as a result of our match vs returning something that doesn't match particulary well.
 
 But now that we have working normalized coordinates we can start in on the next class that we will need to build, Shape.

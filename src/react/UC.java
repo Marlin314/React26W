@@ -8,6 +8,9 @@ public class UC {
   public static final int mainWindowHeight = 700;
   public static final int inkBufferMax = 500;
   public static final int normSampleSize = 25;
+  public static final int normCoordMax = 1000;
+  public static final int noMatchDist = 500_000;
+  
 
   // --Color--
   public static final Color inkColor = Color.BLUE;
