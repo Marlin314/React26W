@@ -1105,6 +1105,7 @@ Remember to turn OFF the drawing of splines when you are done playing for the ne
 
 ::S Animation
 ==Animation
+--Day 4
 
 I will NOT be doing much of anything with animation in this course. However there are always people that primarily want to write video games and it seems wrong to be RIGHT at the place where I can show them how to do it and then NOT SHOW THEM! So this section like the one on splines is essentially a sidebar - I will show you the basic extra stuff for doing some animation and then you can either entirly forget it OR you can finally start your life's work as a computer animator.
 
@@ -1233,7 +1234,7 @@ Now we can modify the dragging case of mouse pressed to record the pressedLoc an
     mouseDelta.set(lastSquare.loc.x - x, lastSquare.loc.y - y);
   }
 
-The game will be in our last change. If you keep your mouse in one place, click and release it on a box, the box stops, but if you were chasing the box, and you moved before you released the mouse, you are changing the velocity of the box instead of stopping it.
+The actual game will come from this last little change to our code. If you keep your mouse in one place, both click and release on a box WITHOUT MOVING, the box stops, but if you were chasing the box, and you moved before you released the mouse, you are changing the velocity of the box instead of stopping it.
 
   @Override
   public void mouseReleased(MouseEvent me){
@@ -1582,7 +1583,6 @@ Because we have done a lot of changes, here is a version of Squares.java
   
 ::C Reaction Architecture
 ::S History
---Day 4
 
 I believe that we now have enough background to start on our main project for this mid level java course, the Gesture based Music Notation application. That last section that I showed you on I.Area was really done to manage some of the complexity that we will run into in our Music App and the next classes that we build have even more to do with it. I could just continue to work bottom up, introducing helper functions and classes, "Hey look at this neat thing that you can do," without telling you why we are building those helpers and What exactly they are going to help with. 
 
@@ -2566,9 +2566,9 @@ In some sense, the ShapeTrainer will not be terribly different from what we are 
 
 And I will warn you in advance. In the first several versions of this course, I wrote two stand alone applications. The first one which we are building now is the Shape Trainer that lets me build a database of Shapes so that we can recognize shapes. The Second one was the music editor which just creates music notation using our shape database to do recognition. 
 
-My original conception was that createing the Shape Database was something that the engineers did, back at the factory, with the Sahpe Trainer, an "in house" tool. Then you ship the customer the "musicEditor" with the fancy gesture interface so that they can edit music. 
+My original conception was that createing the Shape Database was something that the engineers did, back at the factory, with the Shape Trainer, an "in house" tool. Then you ship the customer the "musicEditor" with the fancy gesture interface so that they can edit music. 
 
-My current view is that we should instead build One application, a single integrted thing that lets you both edit music AND edit and change the Shape database. This will save US time in this class from having to continually shift back and forth between two different application when we are building it. This might not be the BEST design for an imaginary music application but it is BETTER for us in this class. It is better in 2 ways. We ge a more responsive system as we are building our Editor, and also, you get to see an example of how to refactor a simple application like a Shape Trainer into a more complicated app that is a combined ShapeTrainer/MusicEditor.
+My current view is that we should instead build One application, a single integrated thing that lets you both edit music AND edit and change the Shape database. This will save US time in this class from having to continually shift back and forth between two different application when we are building it. This might not be the BEST design for an imaginary music application but it is BETTER for us in this class. It is better in 2 ways. We ge a more responsive system as we are building our Editor, and also, you get to see an example of how to refactor a simple application like a Shape Trainer into a more complicated app that is a combined ShapeTrainer/MusicEditor.
 
 So while we are developing the Shape Trainer, we will just be building a single stand alone Shape Trainer app. That is the way I always did it. BUT when we get around to building the music editor, we/I will suddenly realize, "Hey, you know, maybe we should build an integrated application that is both the MusicEditor/ShapeTrainer and we will start refactoring all of the code that we will be writing in this and the next section.
 
@@ -2634,7 +2634,7 @@ in reaction package add:
       curState = (curName.equals("") || curName.equals("DOT")) ? ILLEGAL : UNKNOWN;
     }
     public void paintComponent(Graphics g){
-      G.fillBackg);
+      G.clearBack(g);
       g.setColor(Color.BLACK);
       g.drawString(curName, 600,30);
       g.drawString(curState, 700,30);
@@ -2746,7 +2746,7 @@ We will also, if it is a known Shape, want pull out a static variable that is th
 We have set pList to null if this is an UNKNOWN name. We do that because we call this routine everytime the user types in a letter. They may still be typing. We don't know that they are at a name they want us to create until they actually draw a character. We should update paint component so that it will now show both the Ink.BUFFER as they draw the ink and we want to show the prototypes of the shape that they are training.
 
   public void paintComponent(Graphics g){
-    G.fillBack(g);
+    G.clearBack(g);
     g.setColor(Color.BLACK);
     g.drawString(curName, 600,30);
     g.drawString(curState, 700,30);
@@ -2781,8 +2781,14 @@ Finally we can put in the mouse code. It is very similar to what we had in Paint
     }
     repaint();
   }
+  
+It looks like I forgot to add a main routine to our ShapeTrainer class so do that:
 
+  public static void main(String[] args){PANEL=new ShapeTrainer(); WinApp.launch();}
+  
 Check it out. Enter a name and train some strokes. Change the name and notice that it is unknown. Make the first stroke on the new name and notice that the msg changes now that this state is known. Re-Enter the first name and see that it is now known. 
+
+--Commit: ShapeTrainer pre-serialization
 
 Looks good to me. Time to Serialize.
 
