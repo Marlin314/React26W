@@ -15,4 +15,7 @@ public class UC {
 
   // --Color--
   public static final Color inkColor = Color.BLUE;
+  
+  //--Strings--
+  public static final String shapeDatabaseFileName = "ShapeDB.dat";
 }

@@ -1,5 +1,6 @@
 package react.graphics;
 import java.awt.*;
+import java.io.Serializable;
 import java.util.Random;
 
 public class G{
@@ -9,7 +10,7 @@ public class G{
   public static void clearBack(Graphics g){g.setColor(Color.WHITE); g.fillRect(0,0,5000,5000);}
   public static void drawCircle(Graphics g, int x, int y, int r){g.drawOval(x-r,y-r,r+r,r+r);}
   //-----------------------V------------------------
-  public static class V{
+  public static class V implements Serializable {
     public int x,y;
     public static Transform T = new Transform();
 
@@ -33,6 +34,7 @@ public class G{
         n = (nW>nH)?nW:nH;  d = (oW>oH)?oW:oH;
       }
       private int getOff(int oZ, int oW, int nZ, int nW){
+        
         return (-oZ-oW/2)*n/d + nZ + nW/2;
       }
 
@@ -51,7 +53,7 @@ public class G{
   }
 
   //-----------------------VS-----------------------
-  public static class VS{
+  public static class VS implements Serializable{
     public V loc, size;
     public VS(int x, int y, int w, int h){loc = new V(x,y); size = new V(w,h);}
     public void fill(Graphics g, Color c){g.setColor(c); g.fillRect(loc.x,loc.y,size.x,size.y);}
@@ -83,7 +85,7 @@ public class G{
     public void draw(Graphics g){g.drawRect(h.lo, v.lo, h.hi-h.lo, v.hi-v.lo);}
   }
   //-----------------------PL-----------------------
-  public static class PL { // Polyline
+  public static class PL implements Serializable { // Polyline
     public V[] points;  // we keep an array of points
     public PL(int count){
       points = new V[count]; // allocate the array 

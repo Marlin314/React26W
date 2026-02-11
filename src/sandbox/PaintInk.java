@@ -10,6 +10,7 @@ import java.awt.event.MouseEvent;
 public class PaintInk extends WinApp{
   public static Ink.List inkList = new Ink.List();
   public static Shape.Prototype.List pList = new Shape.Prototype.List();
+  public static String recognized = "";
   
   public PaintInk(){super("Paint Ink", UC.mainWindowWidth, UC.mainWindowHeight);}
   
@@ -26,12 +27,15 @@ public class PaintInk extends WinApp{
       g.drawString("Dist: "+dist, 600, 60);
     }
     pList.show(g);
+    g.setColor(Color.BLACK);
+    g.drawString(recognized, 700, 40);
   }
 
   public void mousePressed(MouseEvent me){Ink.BUFFER.dn(me.getX(),me.getY()); repaint();}
   public void mouseDragged(MouseEvent me){Ink.BUFFER.drag(me.getX(),me.getY()); repaint();}
   public void mouseReleased(MouseEvent me){
     Ink ink = new Ink();
+    Shape s = Shape.recognize(ink); recognized = "Recog: " + ((s != null)?s.name : "UN-RECOGNIZED");
     Shape.Prototype proto;
     inkList.add(ink);
     if(pList.bestDist(ink.norm) < UC.noMatchDist){ // we found a match so blend

@@ -21,6 +21,7 @@ public class ShapeTrainer extends WinApp {
 
   public void setState(){
     curState = !Shape.DB.isLegal(curName) ? ILLEGAL : UNKNOWN;
+    //noinspection StringEquality
     if(curState == UNKNOWN){
       if(Shape.DB.isKnown(curName)){
         curState = KNOWN;
@@ -34,23 +35,9 @@ public class ShapeTrainer extends WinApp {
   public void mousePressed(MouseEvent me){Ink.BUFFER.dn(me.getX(),me.getY()); repaint();}
   public void mouseDragged(MouseEvent me){Ink.BUFFER.drag(me.getX(),me.getY()); repaint();}
   public void mouseReleased(MouseEvent me){
-    if(curState != ILLEGAL){
-      Ink ink = new Ink();
-      Shape.Prototype proto;
-      if(pList == null){
-        Shape s = new Shape(curName); // create the shape
-        Shape.DB.put(curName, s);  // add it to the database
-        pList = s.prototypes;      // use its prototype list as the current list
-      }
-      if(pList.bestDist(ink.norm) < UC.noMatchDist){ // we found a match so blend
-        proto = Shape.Prototype.List.bestMatch;
-        proto.blend(ink.norm);
-      }else {
-        proto = new Shape.Prototype();
-        pList.add(proto); // new Prototype
-      }
-      setState(); // technically after adding the first prototype we now know this shape so fix the msg
-    }
+    Ink ink = new Ink();
+    Shape.DB.train(curName, ink.norm); // this is safe because legal name testing is done in Database
+    setState(); // possibly convert previously UNKNOWN to KNOWN
     repaint();
   }
 
@@ -67,6 +54,7 @@ public class ShapeTrainer extends WinApp {
   public void keyTyped(KeyEvent e) {
     char c = e.getKeyChar(); System.out.println("Typed: " + c);
     curName = (c == ' ' || c == 0x0D || c == 0x0A)? "": curName + c; // x0D & x0A are ascii CR & LF
+    if(c == 0x0D || c == 0x0A){Shape.DB.save();}
     setState();
     repaint();
   }

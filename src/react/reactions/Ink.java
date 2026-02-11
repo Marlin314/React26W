@@ -3,6 +3,7 @@ package react.reactions;
 import react.*;
 import react.graphics.*;
 import java.awt.*;
+import java.io.Serializable;
 import java.util.ArrayList;
 
 public class Ink implements I.Show{
@@ -27,7 +28,7 @@ public class Ink implements I.Show{
     public void add(int x, int y){if(n<MAX){points[n].set(x,y); n++; bbox.add(x,y);}} // update bbox too
     public void show(Graphics g){
       this.drawN(g, n); 
-      //bbox.draw(g); // show bbox to test -- disable after test
+      bbox.draw(g); // show bbox to test -- disable after test
     } 
     public void clear(){n = 0;}
     public boolean hit(int x, int y){return true;} // any point COULD go into ink
@@ -46,7 +47,7 @@ public class Ink implements I.Show{
   }
 
   //--------------------Norm---------------------
-  public static class Norm extends G.PL{
+  public static class Norm extends G.PL implements Serializable {
     public static final int N = UC.normSampleSize, MAX = UC.normCoordMax;
     public static final G.VS NCS = new G.VS(0,0,MAX,MAX); // the coordinate box for Transforms
     
